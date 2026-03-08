@@ -20,7 +20,8 @@
   },
   "onCreateCommand": {
     "system-setup": "bash /workspace/.devcontainer/common-setup.sh",
-    "install-deps": "cd /workspace && bun install"
+    "install-deps": "cd /workspace && bun install",
+    "install-lsp": "bun install -g typescript-language-server"
   },
   "postCreateCommand": {
     "zsh-custom": "bash /workspace/.devcontainer/zsh-custom.sh",
