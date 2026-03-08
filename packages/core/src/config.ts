@@ -116,47 +116,56 @@ export const DEFAULT_TOPICS = [
 
 // ─── AI Presets ──────────────────────────────────────────────
 
+const _g = globalThis as Record<string, unknown>;
+const _p =
+  typeof _g.process === "object"
+    ? (_g.process as Record<string, unknown>)
+    : undefined;
+const _env =
+  typeof _p?.env === "object" ? (_p.env as Record<string, string>) : undefined;
+const LH = _env?.DEVCONTAINER === "true" ? "host.docker.internal" : "localhost";
+
 export const AI_PRESETS: Record<string, AIPreset> = {
   // Self-hosted
   ollama: {
     name: "Ollama",
-    baseURL: "http://localhost:11434/v1",
+    baseURL: `http://${LH}:11434/v1`,
     needsKey: false,
     group: "self-hosted",
   },
   "lm-studio": {
     name: "LM Studio",
-    baseURL: "http://localhost:1234/v1",
+    baseURL: `http://${LH}:1234/v1`,
     needsKey: false,
     group: "self-hosted",
   },
   jan: {
     name: "Jan",
-    baseURL: "http://localhost:1337/v1",
+    baseURL: `http://${LH}:1337/v1`,
     needsKey: false,
     group: "self-hosted",
   },
   gpt4all: {
     name: "GPT4All",
-    baseURL: "http://localhost:4891/v1",
+    baseURL: `http://${LH}:4891/v1`,
     needsKey: false,
     group: "self-hosted",
   },
   localai: {
     name: "LocalAI",
-    baseURL: "http://localhost:8080/v1",
+    baseURL: `http://${LH}:8080/v1`,
     needsKey: false,
     group: "self-hosted",
   },
   llamacpp: {
     name: "llama.cpp server",
-    baseURL: "http://localhost:8081/v1",
+    baseURL: `http://${LH}:8081/v1`,
     needsKey: false,
     group: "self-hosted",
   },
   vllm: {
     name: "vLLM",
-    baseURL: "http://localhost:8000/v1",
+    baseURL: `http://${LH}:8000/v1`,
     needsKey: false,
     group: "self-hosted",
   },
@@ -214,7 +223,7 @@ export const AI_PRESETS: Record<string, AIPreset> = {
 
 export const DEFAULT_API_SERVER_CONFIG: ApiServerConfig = {
   preset: "ollama",
-  baseURL: "http://localhost:11434/v1",
+  baseURL: `http://${LH}:11434/v1`,
   apiKey: "",
   model: "",
   status: "disconnected",

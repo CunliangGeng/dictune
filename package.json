@@ -4,7 +4,7 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "dev:pwa": "bun run --filter @dictune/pwa dev",
-    "dev:tui": "bun run --filter @dictune/tui dev",
+    "dev:tui": "bun run --cwd packages/tui src/cli.tsx",
     "build:pwa": "bun run --filter @dictune/pwa build",
     "build:tui": "bun run --filter @dictune/tui build",
     "typecheck": "bun run --filter '*' typecheck",
