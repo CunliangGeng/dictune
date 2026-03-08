@@ -15,17 +15,17 @@
     },
     "ghcr.io/devcontainers/features/node:1": {
       "version": "22"
-    },
-    "ghcr.io/shyim/devcontainers-features/bun:0": {}
+    }
   },
   "onCreateCommand": {
     "system-setup": "bash /workspace/.devcontainer/common-setup.sh",
-    "install-deps": "cd /workspace && bun install",
-    "install-lsp": "bun install -g typescript-language-server"
+    "install-bun": "curl -fsSL https://bun.sh/install | bash"
   },
   "postCreateCommand": {
     "zsh-custom": "bash /workspace/.devcontainer/zsh-custom.sh",
-    "claude-code": "curl -fsSL https://claude.ai/install.sh | bash"
+    "claude-code": "curl -fsSL https://claude.ai/install.sh | bash",
+    "install-deps": "cd /workspace && bun install",
+    "install-lsp": "bun install -g typescript-language-server"
   },
   "waitFor": "postCreateCommand",
   "customizations": {
