@@ -697,7 +697,7 @@ function SettingsSidebar({
                   onClick={() => setAiProvider("browser")}
                   style={providerBtnStyle(aiProvider === "browser")}
                 >
-                  Browser AI
+                  In-browser AI
                 </button>
               )}
               <button
@@ -705,12 +705,12 @@ function SettingsSidebar({
                 onClick={() => setAiProvider("api-server")}
                 style={providerBtnStyle(aiProvider === "api-server")}
               >
-                API Server
+                Local or Cloud AI
               </button>
             </div>
           </div>
 
-          {/* Browser AI settings */}
+          {/* In-browser AI settings */}
           {aiProvider === "browser" && (
             <>
               <div>
@@ -792,7 +792,7 @@ function SettingsSidebar({
             </>
           )}
 
-          {/* API Server settings */}
+          {/* Local or Cloud AI settings */}
           {aiProvider === "api-server" && (
             <>
               <div>
@@ -1245,7 +1245,7 @@ export default function Dictune() {
                 }}
                 style={{ flex: 1, padding: "10px", fontSize: "13px" }}
               >
-                Use API Server
+                Use Local or Cloud AI
               </button>
               <button
                 type="button"
@@ -1489,7 +1489,7 @@ export default function Dictune() {
                       >
                         {aiProvider === "browser"
                           ? `Using ${browserAi.modelId.replace(/-q4f16_1-MLC$/, "").replace("-", " ")} to generate...`
-                          : `Using ${apiServerConfig.model || "API Server"} on ${AI_PRESETS[apiServerConfig.preset]?.name || apiServerConfig.baseURL} to generate...`}
+                          : `Using ${apiServerConfig.model || "AI"} on ${AI_PRESETS[apiServerConfig.preset]?.name || apiServerConfig.baseURL} to generate...`}
                       </span>
                     </>
                   )}

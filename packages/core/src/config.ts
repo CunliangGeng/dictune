@@ -30,6 +30,8 @@ DIFFICULTY: ${diff}
 
 STYLE: Natural SPOKEN style — like a conversation, story, or voice message. Use contractions (I'm, don't, we've). Sound like real speech.
 
+LANGUAGE: Every single word must be in English. Do NOT mix in any other language. No foreign words, no translations.
+
 Output ONLY the ${sentences} sentences. Nothing else.`;
     },
   },
@@ -52,6 +54,8 @@ MOEILIJKHEID: ${diff}
 
 STIJL: Natuurlijke SPREEKSTIJL — als een gesprek, verhaal, of voicemail. Klink als echt gesproken Nederlands.
 
+TAAL: Elk woord moet in het Nederlands zijn. Gebruik GEEN Engelse of andere buitenlandse woorden. Geen vertalingen, geen codeswitching.
+
 Geef ALLEEN de ${sentences} zinnen. Niets anders.`;
     },
   },
@@ -73,6 +77,8 @@ Geef ALLEEN de ${sentences} zinnen. Niets anders.`;
 难度要求：${diff}
 
 风格：自然口语风格——像聊天、讲故事或发语音消息。读出来像真实的说话。
+
+语言：每个字都必须是中文。绝对不要混入英文或其他语言。不要夹杂外语单词、翻译或注释。
 
 只输出这${sentences}句话。不要其他任何内容。`;
     },
