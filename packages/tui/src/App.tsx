@@ -177,6 +177,7 @@ export function App() {
     "menu" | "preset" | "url" | "key" | "model" | "test"
   >("menu");
   const [testMsg, setTestMsg] = useState<string | null>(null);
+  const [genStatus, setGenStatus] = useState("");
 
   const t = UI_STRINGS[lang];
   const levelLabel = {
@@ -192,9 +193,26 @@ export function App() {
     setOriginalText("");
     setTranscription("");
     setResult(null);
+    setGenStatus("");
     try {
       const prompt = buildPrompt(lang, level, duration, topic || undefined);
-      const text = await generateWithLocal(prompt, aiConfig);
+      // Auto-connect if needed (same as PWA)
+      let config = aiConfig;
+      if (!config.model || config.status !== "connected") {
+        try {
+          const models = await testLocalConnection(config);
+          const model = config.model || models[0] || "";
+          config = { ...config, status: "connected", models, model };
+          setAiConfig(config);
+        } catch {
+          throw new Error(
+            `Cannot connect to ${AI_PRESETS[config.preset]?.name || config.baseURL}. Check settings [s] and try again.`,
+          );
+        }
+      }
+      const serviceName = AI_PRESETS[config.preset]?.name || config.baseURL;
+      setGenStatus(`Using ${config.model} on ${serviceName}`);
+      const text = await generateWithLocal(prompt, config);
       setOriginalText(text);
       setScreen("practice");
     } catch (e: any) {
@@ -331,6 +349,11 @@ export function App() {
           </Text>
           <Text> Generating practice text...</Text>
         </Box>
+        {genStatus && (
+          <Box marginTop={0}>
+            <Text dimColor> {genStatus}</Text>
+          </Box>
+        )}
       </Box>
     );
   }
@@ -595,16 +618,25 @@ export function App() {
     }
 
     if (settingsStep === "preset") {
-      const items = Object.entries(AI_PRESETS).map(([k, v]) => ({
-        label: v.name,
-        value: k,
-      }));
+      const selfHosted = Object.entries(AI_PRESETS).filter(
+        ([, v]) => v.group === "self-hosted",
+      );
+      const cloud = Object.entries(AI_PRESETS).filter(
+        ([, v]) => v.group === "cloud",
+      );
+      const items = [
+        { label: "── Self-hosted ──", value: "__header_sh" },
+        ...selfHosted.map(([k, v]) => ({ label: `  ${v.name}`, value: k })),
+        { label: "── Cloud ──", value: "__header_cl" },
+        ...cloud.map(([k, v]) => ({ label: `  ${v.name}`, value: k })),
+      ];
       return (
         <Box flexDirection="column" padding={1}>
           <Text bold>Select AI service:</Text>
           <SelectInput
             items={items}
             onSelect={(item) => {
+              if (item.value.startsWith("__header")) return;
               const p = AI_PRESETS[item.value];
               setAiConfig((c) => ({
                 ...c,
@@ -647,7 +679,13 @@ export function App() {
     if (settingsStep === "key") {
       return (
         <Box flexDirection="column" padding={1}>
-          <Text bold>API Key (optional, Enter to skip):</Text>
+          <Text bold>
+            API Key{" "}
+            {AI_PRESETS[aiConfig.preset]?.needsKey
+              ? "(required)"
+              : "(optional, Enter to skip)"}
+            :
+          </Text>
           <Box>
             <Text color={C.accent}>❯ </Text>
             <TextInput
