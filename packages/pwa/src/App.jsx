@@ -13,6 +13,9 @@ import {
 } from "@dictune/core";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const logoSvg = `${import.meta.env.BASE_URL}logo.svg`;
+const wordmarkSvg = `${import.meta.env.BASE_URL}wordmark.svg`;
+
 // browser-ai.js is loaded lazily to avoid pulling in @mlc-ai/web-llm (6MB) on page load
 const browserAiModule = () => import("./browser-ai.js");
 
@@ -1279,44 +1282,54 @@ export default function Dictune() {
         style={{
           borderBottom: "1px solid var(--border)",
           background: "var(--surface)",
-          padding: "12px 24px",
+          padding: "16px 24px",
           display: "flex",
           alignItems: "center",
-          gap: "10px",
+          gap: "12px",
           position: "sticky",
           top: 0,
           zIndex: 10,
           transition: "background 0.3s",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{ color: "var(--accent)" }}
-          >
-            <circle cx="12" cy="12" r="3" fill="currentColor" />
-            <path
-              d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 2a8 8 0 11-8 8c0-1.2.26-2.33.73-3.35"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              fill="none"
-              strokeLinecap="round"
-            />
-          </svg>
-          <span
-            style={{
-              fontSize: "17px",
-              fontWeight: 700,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Dictune
-          </span>
+        <div style={{ display: "flex", alignItems: "bottom", gap: "8px" }}>
+          <img
+            src={logoSvg}
+            alt=""
+            width="32"
+            height="32"
+            style={{ display: "block" }}
+          />
+          <img
+            src={wordmarkSvg}
+            alt="Dictune"
+            height="32"
+            style={{ display: "block" }}
+          />
         </div>
         <span style={{ flex: 1 }} />
+        <a
+          href="https://github.com/CunliangGeng/dictune"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "90%",
+            border: "1.5px solid var(--border)",
+            background: "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--text-tertiary)",
+            flexShrink: 0,
+          }}
+          title="GitHub"
+        >
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z" />
+          </svg>
+        </a>
         <button
           type="button"
           onClick={() => setDark(!dark)}

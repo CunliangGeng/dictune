@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 5 330 62" width="330" height="62">
+  <defs>
+    <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="5%">
+      <stop offset="0%" stop-color="#166C5C"/>
+      <stop offset="40%" stop-color="#1E8B7E"/>
+      <stop offset="100%" stop-color="#2DA69A"/>
+    </linearGradient>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Italiana&amp;display=swap');
+    </style>
+  </defs>
+  <text x="0" y="60" 
+    font-family="Italiana, 'Didot', 'Bodoni MT', Georgia, serif" 
+    font-size="72" 
+    fill="url(#tg)" 
+    letter-spacing="4">Dictune</text>
+</svg>
