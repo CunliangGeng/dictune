@@ -1,5 +1,45 @@
 # Changelog
 
+## UI Polish & Prompt Improvements (2026-03-08)
+
+### Prompt Coherence
+- Prompts now require a **coherent paragraph** (story, conversation, or narrative) instead of random unrelated sentences
+- Each paragraph must have a beginning, middle, and end
+- Prompts enforce **complete, full sentences** — not fragments or isolated words
+
+### Localized Difficulty Labels
+- Difficulty levels displayed in each language's native words:
+  - English: Beginner / Intermediate / Advanced
+  - Dutch: Beginner / Gemiddeld / Gevorderd
+  - Chinese: 初级 / 中级 / 高级
+- Applied to both PWA dropdowns and TUI select menus
+
+### PWA Layout Improvements
+- **Controls bar moved above panels** — dropdowns, topic input, and generate button now sit above the original/dictation grid, so both panels are equal width
+- **Rounded corners** on both panels (previously only top/bottom rounded where they joined)
+- **Header redesign** — uses project logo (`logo.svg`) + wordmark (`wordmark.svg`) from `public/`
+- **GitHub icon** added to header (left of theme toggle)
+- **Favicon** updated to use the actual project logo SVG
+
+### UI String Updates
+- Welcome text now says "Choose AI in settings [gear icon], then generate a practice text"
+- Dictation placeholder updated to reference "original text" instead of "text above"
+- All UI string changes applied across English, Dutch, and Chinese
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/core/src/config.ts` | Coherent paragraph prompts, localized level labels, updated UI strings |
+| `packages/core/src/types.ts` | Added `levelEasy`, `levelMedium`, `levelHard` to `UIStrings` |
+| `packages/pwa/src/App.jsx` | Controls bar above grid, logo header, GitHub link, rounded panels, localized dropdowns |
+| `packages/pwa/vite.config.js` | SVG logo in PWA manifest, precache logo/wordmark |
+| `packages/pwa/index.html` | Relative favicon path for dev mode compatibility |
+| `packages/pwa/public/` | Added `logo.svg`, `wordmark.svg`, `logo-wordmark.svg`; replaced `favicon.svg`; removed PNG icons |
+| `packages/tui/src/App.tsx` | Localized level labels in select menu and breadcrumbs |
+
+---
+
 ## TUI Improvements (2026-03-08)
 
 ### Ink v6 Upgrade

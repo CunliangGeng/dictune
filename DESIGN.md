@@ -32,7 +32,11 @@ dictune/
 │   │       └── index.ts        Barrel export
 │   │
 │   ├── pwa/               ← Web app (Vite + React + vite-plugin-pwa)
-│   │   ├── public/             Static assets (icons, favicon)
+│   │   ├── public/
+│   │   │   ├── favicon.svg      App logo (used as browser tab icon)
+│   │   │   ├── logo.svg         Project logo (header, manifest)
+│   │   │   ├── wordmark.svg     "Dictune" wordmark (header)
+│   │   │   └── logo-wordmark.svg  Combined logo + wordmark
 │   │   ├── src/
 │   │   │   ├── main.jsx        Entry point
 │   │   │   ├── App.jsx         Full UI (imports from @dictune/core)
@@ -159,6 +163,8 @@ Presets are grouped into self-hosted and cloud:
 - All prompts request spoken/conversational style text, not written prose
 - Exact sentence counts (e.g. "Write exactly 6 sentences") instead of vague word counts — small models follow this much better
 - Difficulty levels use concrete constraints (word complexity, sentence length, grammar rules) instead of abstract CEFR standards
+- **Coherence requirement**: prompts require a connected paragraph (story, conversation, or narrative) with beginning, middle, and end — not random unrelated sentences
+- **Complete sentences**: prompts enforce full sentences, not fragments or isolated words
 - Random default topics (cats, cooking, travel, etc.) when no topic is provided
 - Strict single-language enforcement in every prompt
 
@@ -185,7 +191,7 @@ Presets are grouped into self-hosted and cloud:
 | Resource | Strategy | TTL |
 |----------|----------|-----|
 | App shell (HTML/JS/CSS) | Precache (install-time) | Until update |
-| Icons, SVG | Precache | Until update |
+| SVG assets (logo, wordmark, favicon) | Precache | Until update |
 | Google Fonts CSS | CacheFirst (runtime) | 1 year |
 | Google Fonts WOFF2 | CacheFirst (runtime) | 1 year |
 | WebLLM chunk (~6MB) | Precache | Until update |
@@ -213,7 +219,11 @@ Presets are grouped into self-hosted and cloud:
 | Missing | `#BF616A` | `#BF616A` | Red |
 | Extra | `#5E81AC` | `#81A1C1` | Frost |
 
-**Layout**: Single-page, two stacked panels (mobile: vertical, desktop: side-by-side)
+**Header**: Project logo (`logo.svg`) + wordmark (`wordmark.svg`) on the left, GitHub icon + theme toggle + settings button on the right. Assets loaded from `public/` via `import.meta.env.BASE_URL`.
+
+**Layout**: Controls bar (language, level, topic input, generate button) sits above a two-panel grid. Both panels (original + dictation) have equal width with rounded corners (`14px` border radius). Desktop: side-by-side; mobile: stacked vertically.
+
+**Localized difficulty labels**: Dropdown levels display in each language's native words (e.g. English: Beginner/Intermediate/Advanced, Dutch: Beginner/Gemiddeld/Gevorderd, Chinese: 初级/中级/高级) via `levelEasy`/`levelMedium`/`levelHard` UI strings.
 
 **Components** (all in `App.jsx`):
 - `Dropdown` — click-to-open option selector
