@@ -41,7 +41,7 @@ const C = {
   correct: "#A3BE8C",
   wrong: "#EBCB8B",
   missing: "#BF616A",
-  extra: "#5E81AC",
+  extra: "#81A1C1",
   dim: "#4C566A",
   frost: "#88C0D0",
   muted: "#7B88A1",
@@ -176,6 +176,7 @@ export function App() {
   const [settingsStep, setSettingsStep] = useState<
     "menu" | "preset" | "url" | "key" | "model" | "test"
   >("menu");
+  const [prevScreen, setPrevScreen] = useState<Screen>("lang");
   const [testMsg, setTestMsg] = useState<string | null>(null);
   const [genStatus, setGenStatus] = useState("");
 
@@ -228,19 +229,67 @@ export function App() {
     setScreen("results");
   }, [originalText, transcription, lang]);
 
+  // ── Navigate to settings (available from any non-input screen) ──
+  const openSettings = useCallback(() => {
+    setSettingsStep("menu");
+    setPrevScreen(screen);
+    setScreen("settings");
+  }, [screen]);
+
   // ── Key handler for global shortcuts ──
   useInput((input, _key) => {
     if (input === "q" && (screen === "lang" || screen === "results")) exit();
-    if (input === "s" && screen === "lang") {
-      setSettingsStep("menu");
-      setScreen("settings");
+    if (
+      input === "s" &&
+      screen !== "settings" &&
+      screen !== "topic" &&
+      screen !== "practice" &&
+      screen !== "generating"
+    ) {
+      openSettings();
+    }
+
+    // Number shortcuts for selection screens
+    if (screen === "lang") {
+      const idx = Number(input) - 1;
+      if (idx >= 0 && idx < LANG_CODES.length) {
+        setLang(LANG_CODES[idx]);
+        setScreen("level");
+      }
+    }
+    if (screen === "level") {
+      const idx = Number(input) - 1;
+      if (idx >= 0 && idx < LEVELS.length) {
+        setLevel(LEVELS[idx]);
+        setScreen("duration");
+      }
+    }
+    if (screen === "duration") {
+      const idx = Number(input) - 1;
+      if (idx >= 0 && idx < DURATIONS.length) {
+        setDuration(DURATIONS[idx].value);
+        setScreen("topic");
+      }
+    }
+
+    // Letter shortcuts for results actions
+    if (screen === "results") {
+      if (input === "r") {
+        setTranscription("");
+        setResult(null);
+        setScreen("practice");
+      } else if (input === "n") doGenerate();
+      else if (input === "b") {
+        setResult(null);
+        setScreen("lang");
+      }
     }
   });
 
   // ── Lang selection ──
   if (screen === "lang") {
-    const items = LANG_CODES.map((c) => ({
-      label: `${LANGUAGES[c].flag}  ${LANGUAGES[c].native}`,
+    const items = LANG_CODES.map((c, i) => ({
+      label: `[${i + 1}] ${LANGUAGES[c].flag}  ${LANGUAGES[c].native}`,
       value: c,
     }));
     return (
@@ -273,7 +322,10 @@ export function App() {
       medium: t.levelMedium,
       hard: t.levelHard,
     };
-    const items = LEVELS.map((l) => ({ label: levelLabels[l], value: l }));
+    const items = LEVELS.map((l, i) => ({
+      label: `[${i + 1}] ${levelLabels[l]}`,
+      value: l,
+    }));
     return (
       <Box flexDirection="column" padding={1}>
         <Text dimColor>
@@ -287,14 +339,17 @@ export function App() {
             setScreen("duration");
           }}
         />
+        <Box marginTop={1}>
+          <Text dimColor>[s] Settings</Text>
+        </Box>
       </Box>
     );
   }
 
   // ── Duration selection ──
   if (screen === "duration") {
-    const items = DURATIONS.map((d) => ({
-      label: d.label,
+    const items = DURATIONS.map((d, i) => ({
+      label: `[${i + 1}] ${d.label}`,
       value: String(d.value),
     }));
     return (
@@ -310,6 +365,9 @@ export function App() {
             setScreen("topic");
           }}
         />
+        <Box marginTop={1}>
+          <Text dimColor>[s] Settings</Text>
+        </Box>
       </Box>
     );
   }
@@ -324,7 +382,7 @@ export function App() {
         </Text>
         {error && <Text color={C.missing}>Error: {error}</Text>}
         <Box marginTop={1}>
-          <Text bold>Topic (optional, press Enter to skip): </Text>
+          <Text bold>{t.topicPlaceholder}</Text>
         </Box>
         <Box>
           <Text color={C.accent}>❯ </Text>
@@ -332,7 +390,7 @@ export function App() {
             value={topic}
             onChange={setTopic}
             onSubmit={() => doGenerate()}
-            placeholder="e.g. travel, cooking..."
+            placeholder="Enter ↵ to skip"
           />
         </Box>
       </Box>
@@ -370,7 +428,7 @@ export function App() {
           flexDirection="column"
         >
           <Text bold color={C.accent}>
-            ORIGINAL TEXT
+            {t.original.toUpperCase()}
           </Text>
           <Text>
             {"\n"}
@@ -378,7 +436,8 @@ export function App() {
           </Text>
         </Box>
         <Box marginTop={1} flexDirection="column">
-          <Text bold>Your dictation (paste or type, then press Enter):</Text>
+          <Text bold>{t.dictation}</Text>
+          <Text dimColor>{t.placeholder}</Text>
           <Box marginTop={1}>
             <Text color={C.frost}>❯ </Text>
             <TextInput
@@ -387,7 +446,7 @@ export function App() {
               onSubmit={() => {
                 if (transcription.trim()) doCompare();
               }}
-              placeholder="Type or paste dictation result here..."
+              placeholder={`Enter ↵ to ${t.compare.toLowerCase()}`}
             />
           </Box>
         </Box>
@@ -417,7 +476,7 @@ export function App() {
             width="50%"
           >
             <Text bold dimColor>
-              ORIGINAL
+              {t.original.toUpperCase()}
             </Text>
             <DiffLine diff={result.diff} sep={result.sep} side="original" />
           </Box>
@@ -431,7 +490,7 @@ export function App() {
             width="50%"
           >
             <Text bold dimColor>
-              DICTATION
+              {t.dictation.toUpperCase()}
             </Text>
             <DiffLine
               diff={result.diff}
@@ -453,7 +512,7 @@ export function App() {
             abc{" "}
           </Text>
           <Text dimColor> {t.legendMissing}</Text>
-          <Text backgroundColor={C.extra} color="white">
+          <Text backgroundColor={C.extra} color="black">
             {" "}
             abc{" "}
           </Text>
@@ -462,6 +521,12 @@ export function App() {
 
         {/* Score */}
         <Box marginTop={1} flexDirection="column">
+          <Box gap={1}>
+            <Text bold color={scoreColor}>
+              {result.accuracy}%
+            </Text>
+            <Text dimColor>{t.accuracy}</Text>
+          </Box>
           <ProgressBar percent={result.accuracy} color={scoreColor} />
           <Box marginTop={1} gap={1}>
             <StatBox label={t.total} value={result.total} />
@@ -484,10 +549,11 @@ export function App() {
         <Box marginTop={1}>
           <SelectInput
             items={[
-              { label: `↻  ${t.tryAgain}`, value: "retry" },
-              { label: `▸  ${t.generateNew}`, value: "new" },
-              { label: "←  Change settings", value: "setup" },
-              { label: "✕  Quit", value: "quit" },
+              { label: `[r] ${t.tryAgain}`, value: "retry" },
+              { label: `[n] ${t.generateNew}`, value: "new" },
+              { label: "[s] Settings", value: "settings" },
+              { label: "[b] Back", value: "setup" },
+              { label: "[q] Quit", value: "quit" },
             ]}
             onSelect={(item) => {
               if (item.value === "retry") {
@@ -495,7 +561,9 @@ export function App() {
                 setResult(null);
                 setScreen("practice");
               } else if (item.value === "new") doGenerate();
-              else if (item.value === "setup") {
+              else if (item.value === "settings") {
+                openSettings();
+              } else if (item.value === "setup") {
                 setResult(null);
                 setScreen("lang");
               } else exit();
@@ -525,7 +593,7 @@ export function App() {
       return (
         <Box flexDirection="column" padding={1}>
           <Text bold color={C.accent}>
-            ⚙ API Server Settings
+            ⚙ AI Settings
           </Text>
           <Box marginTop={1}>
             <Text>
@@ -559,7 +627,7 @@ export function App() {
                 { label: "← Back", value: "back" },
               ]}
               onSelect={(item) => {
-                if (item.value === "back") setScreen("lang");
+                if (item.value === "back") setScreen(prevScreen);
                 else if (item.value === "test") {
                   setSettingsStep("test");
                   setTestMsg("Testing...");
