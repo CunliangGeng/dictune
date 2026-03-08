@@ -51,6 +51,10 @@ Bun workspace monorepo with three packages:
 - **Theme**: Nord Aurora color palette. PWA uses CSS variables (LIGHT/DARK objects in App.jsx). TUI uses hex colors directly (Ink supports hex).
 - **Both surfaces share the same React mental model** (hooks, state, components) but render to different targets (DOM vs terminal ANSI).
 
+## Hard Rules
+
+- **Always commit before making changes.** Before modifying any files, create a commit of the current state so changes can be easily reviewed and reverted.
+
 ## Conventions
 
 - Package manager is **Bun** exclusively — not npm/yarn/pnpm
