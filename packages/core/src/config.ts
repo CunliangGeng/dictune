@@ -167,6 +167,30 @@ export const AI_PRESETS: Record<string, AIPreset> = {
     needsKey: true,
     group: "cloud",
   },
+  anthropic: {
+    name: "Anthropic",
+    baseURL: "https://api.anthropic.com/v1/",
+    needsKey: true,
+    group: "cloud",
+  },
+  gemini: {
+    name: "Google Gemini",
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+    needsKey: true,
+    group: "cloud",
+  },
+  mistral: {
+    name: "Mistral AI",
+    baseURL: "https://api.mistral.ai/v1",
+    needsKey: true,
+    group: "cloud",
+  },
+  deepseek: {
+    name: "DeepSeek",
+    baseURL: "https://api.deepseek.com/v1",
+    needsKey: true,
+    group: "cloud",
+  },
   together: {
     name: "Together AI",
     baseURL: "https://api.together.xyz/v1",

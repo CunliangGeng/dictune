@@ -60,7 +60,8 @@ export async function generateWithBrowserAI(prompt) {
     messages: [
       {
         role: "system",
-        content: "/no_think\nYou are a text generator. Output ONLY the requested text. Never use <think> tags. Never explain your reasoning.",
+        content:
+          "/no_think\nYou are a text generator. Output ONLY the requested text. Never use <think> tags. Never explain your reasoning.",
       },
       { role: "user", content: prompt },
     ],
