@@ -375,30 +375,39 @@ export function App() {
     return (
       <Box flexDirection="column" padding={1}>
         {/* Diff panels */}
-        <Box
-          borderStyle="round"
-          borderColor={C.dim}
-          paddingX={2}
-          paddingY={1}
-          flexDirection="column"
-        >
-          <Text bold dimColor>
-            ORIGINAL
-          </Text>
-          <DiffLine diff={result.diff} sep={result.sep} side="original" />
-        </Box>
-        <Box
-          borderStyle="round"
-          borderColor={C.dim}
-          paddingX={2}
-          paddingY={1}
-          flexDirection="column"
-          marginTop={-1}
-        >
-          <Text bold dimColor>
-            DICTATION
-          </Text>
-          <DiffLine diff={result.diff} sep={result.sep} side="transcription" />
+        <Box flexDirection="row" gap={1}>
+          <Box
+            borderStyle="round"
+            borderColor={C.dim}
+            paddingX={2}
+            paddingY={1}
+            flexDirection="column"
+            flexGrow={1}
+            width="50%"
+          >
+            <Text bold dimColor>
+              ORIGINAL
+            </Text>
+            <DiffLine diff={result.diff} sep={result.sep} side="original" />
+          </Box>
+          <Box
+            borderStyle="round"
+            borderColor={C.dim}
+            paddingX={2}
+            paddingY={1}
+            flexDirection="column"
+            flexGrow={1}
+            width="50%"
+          >
+            <Text bold dimColor>
+              DICTATION
+            </Text>
+            <DiffLine
+              diff={result.diff}
+              sep={result.sep}
+              side="transcription"
+            />
+          </Box>
         </Box>
 
         {/* Legend */}
