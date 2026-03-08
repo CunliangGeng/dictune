@@ -1,6 +1,17 @@
 {
   "name": "dictune",
   "private": true,
+  "description": "Pronunciation clarity practice tool — PWA and TUI",
+  "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CunliangGeng/dictune.git"
+  },
+  "homepage": "https://github.com/CunliangGeng/dictune",
+  "bugs": {
+    "url": "https://github.com/CunliangGeng/dictune/issues"
+  },
   "workspaces": ["packages/*"],
   "scripts": {
     "dev:pwa": "bun run --filter @dictune/pwa dev",

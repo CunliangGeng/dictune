@@ -2,6 +2,14 @@
   "name": "@dictune/core",
   "version": "0.5.0",
   "type": "module",
+  "description": "Shared logic for Dictune — diff engine, AI generation, config",
+  "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CunliangGeng/dictune.git",
+    "directory": "packages/core"
+  },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {

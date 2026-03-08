@@ -3,6 +3,14 @@
   "version": "0.5.0",
   "private": true,
   "type": "module",
+  "description": "Dictune PWA — pronunciation practice web app",
+  "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CunliangGeng/dictune.git",
+    "directory": "packages/pwa"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
