@@ -4,6 +4,16 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   base: "/dictune/",
+  optimizeDeps: { exclude: ["@mlc-ai/web-llm"] },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "web-llm": ["@mlc-ai/web-llm"],
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({
@@ -42,6 +52,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         runtimeCaching: [
           {
             // Cache Google Fonts stylesheets

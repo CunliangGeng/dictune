@@ -1,30 +1,11 @@
-import { LANGUAGES } from "./config";
-import type { AIConfig, CEFRLevel, LangCode } from "./types";
+import { DEFAULT_TOPICS, LANGUAGES } from "./config";
+import type { ApiServerConfig, DifficultyLevel, LangCode } from "./types";
 
-// ─── Embedded AI (Anthropic API) ─────────────────────────────
-
-export async function generateWithEmbedded(prompt: string): Promise<string> {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-  if (!res.ok) throw new Error(`Embedded AI error: ${res.status}`);
-  const d = await res.json();
-  const text = d.content?.find((x: any) => x.type === "text")?.text?.trim();
-  if (!text) throw new Error("No text returned from embedded AI");
-  return text;
-}
-
-// ─── Local AI (OpenAI-compatible) ────────────────────────────
+// ─── API Server (OpenAI-compatible) ─────────────────────────
 
 export async function generateWithLocal(
   prompt: string,
-  config: AIConfig,
+  config: ApiServerConfig,
 ): Promise<string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -42,50 +23,33 @@ export async function generateWithLocal(
     }),
     signal: AbortSignal.timeout(30000),
   });
-  if (!res.ok) throw new Error(`Local AI error: ${res.status}`);
+  if (!res.ok) throw new Error(`API Server error: ${res.status}`);
   const d = await res.json();
   const text = d.choices?.[0]?.message?.content?.trim();
-  if (!text) throw new Error("No text returned from local AI");
+  if (!text) throw new Error("No text returned from API Server");
   return text;
 }
 
-// ─── Unified generation with fallback ────────────────────────
+// ─── Prompt builder ─────────────────────────────────────────
 
 export function buildPrompt(
   lang: LangCode,
-  level: CEFRLevel,
+  level: DifficultyLevel,
   durationMin: number,
   topic?: string,
 ): string {
   const c = LANGUAGES[lang];
   const wordCount = Math.round(c.wordsPerMin * durationMin);
-  return c.prompt(level, wordCount, topic);
-}
-
-export async function generateText(
-  lang: LangCode,
-  level: CEFRLevel,
-  durationMin: number,
-  topic: string | undefined,
-  aiConfig: AIConfig,
-): Promise<string> {
-  const prompt = buildPrompt(lang, level, durationMin, topic);
-
-  // Try local AI first if configured and connected
-  if (aiConfig.enabled && aiConfig.status === "connected" && aiConfig.model) {
-    try {
-      return await generateWithLocal(prompt, aiConfig);
-    } catch (e: any) {
-      console.warn("Local AI failed, falling back to embedded:", e.message);
-    }
-  }
-
-  return await generateWithEmbedded(prompt);
+  const t =
+    topic || DEFAULT_TOPICS[Math.floor(Math.random() * DEFAULT_TOPICS.length)];
+  return c.prompt(level, wordCount, t);
 }
 
 // ─── Connection test ─────────────────────────────────────────
 
-export async function testLocalConnection(config: AIConfig): Promise<string[]> {
+export async function testLocalConnection(
+  config: ApiServerConfig,
+): Promise<string[]> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };

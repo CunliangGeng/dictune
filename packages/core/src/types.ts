@@ -2,6 +2,7 @@
 
 export type LangCode = "en" | "nl" | "zh";
 export type CEFRLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+export type DifficultyLevel = "easy" | "medium" | "hard";
 export type DiffMode = "word" | "char";
 
 export interface LanguageConfig {
@@ -9,7 +10,7 @@ export interface LanguageConfig {
   flag: string;
   diffMode: DiffMode;
   wordsPerMin: number;
-  prompt: (level: CEFRLevel, length: number, topic?: string) => string;
+  prompt: (level: DifficultyLevel, length: number, topic?: string) => string;
 }
 
 export interface DurationOption {
@@ -21,8 +22,7 @@ export interface DurationOption {
 
 export type AIConnectionStatus = "disconnected" | "connected" | "error";
 
-export interface AIConfig {
-  enabled: boolean;
+export interface ApiServerConfig {
   preset: string;
   baseURL: string;
   apiKey: string;
@@ -35,6 +35,7 @@ export interface AIPreset {
   name: string;
   baseURL: string;
   needsKey: boolean;
+  group: "self-hosted" | "cloud";
 }
 
 // ─── Diff Types ──────────────────────────────────────────────

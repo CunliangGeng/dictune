@@ -1,9 +1,10 @@
 import {
   AI_PRESETS,
+  buildPrompt,
   compareTexts,
-  DEFAULT_AI_CONFIG,
+  DEFAULT_API_SERVER_CONFIG,
   DURATIONS,
-  generateText,
+  generateWithLocal,
   LANG_CODES,
   LANGUAGES,
   LEVELS,
@@ -11,6 +12,23 @@ import {
   UI_STRINGS,
 } from "@dictune/core";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+// browser-ai.js is loaded lazily to avoid pulling in @mlc-ai/web-llm (6MB) on page load
+const browserAiModule = () => import("./browser-ai.js");
+
+const BROWSER_AI_MODELS = [
+  {
+    id: "Qwen3-0.6B-q4f16_1-MLC",
+    label: "Qwen3 0.6B (~350MB)",
+    size: "~350MB",
+  },
+  { id: "Qwen3-1.7B-q4f16_1-MLC", label: "Qwen3 1.7B (~1GB)", size: "~1GB" },
+];
+const DEFAULT_BROWSER_MODEL = BROWSER_AI_MODELS[0].id;
+
+function isWebGPUSupported() {
+  return typeof navigator !== "undefined" && "gpu" in navigator;
+}
 
 // ─── Nord Aurora Themes (PWA-specific) ───────────────────────
 const LIGHT = {
@@ -459,16 +477,44 @@ function DiffLegend({ lang }) {
 }
 
 // ─── Settings Sidebar ────────────────────────────────────────
-function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
+function SettingsSidebar({
+  open,
+  onClose,
+  aiProvider,
+  setAiProvider,
+  browserAi,
+  setBrowserAi,
+  apiServerConfig,
+  setApiServerConfig,
+  webGPUSupported,
+}) {
   const [testing, setTesting] = useState(false);
   const [testMsg, setTestMsg] = useState(null);
-  const presetOpts = Object.entries(AI_PRESETS).map(([k, v]) => ({
-    value: k,
-    label: v.name,
-  }));
+  const [modelCacheStatus, setModelCacheStatus] = useState({});
+
+  useEffect(() => {
+    if (!open) return;
+    browserAiModule().then((mod) => {
+      for (const m of BROWSER_AI_MODELS) {
+        mod
+          .isBrowserAIModelCached(m.id)
+          .then((cached) =>
+            setModelCacheStatus((s) => ({ ...s, [m.id]: cached })),
+          );
+      }
+    });
+  }, [open]);
+
+  const selfHostedPresets = Object.entries(AI_PRESETS).filter(
+    ([, v]) => v.group === "self-hosted",
+  );
+  const cloudPresets = Object.entries(AI_PRESETS).filter(
+    ([, v]) => v.group === "cloud",
+  );
+
   const handlePresetChange = (preset) => {
     const p = AI_PRESETS[preset];
-    setAiConfig((c) => ({
+    setApiServerConfig((c) => ({
       ...c,
       preset,
       baseURL: p.baseURL,
@@ -482,8 +528,8 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
     setTesting(true);
     setTestMsg(null);
     try {
-      const models = await testLocalConnection(aiConfig);
-      setAiConfig((c) => ({
+      const models = await testLocalConnection(apiServerConfig);
+      setApiServerConfig((c) => ({
         ...c,
         status: "connected",
         models,
@@ -494,12 +540,22 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
         text: `Connected! ${models.length} model(s) found.`,
       });
     } catch (e) {
-      setAiConfig((c) => ({ ...c, status: "error", models: [] }));
+      setApiServerConfig((c) => ({ ...c, status: "error", models: [] }));
       setTestMsg({ ok: false, text: e.message });
     } finally {
       setTesting(false);
     }
   };
+  const handleDeleteCache = async (modelId) => {
+    const mod = await browserAiModule();
+    await mod.deleteCachedModel(modelId);
+    if (browserAi.modelId === modelId) {
+      await mod.unloadBrowserAI();
+      setBrowserAi((s) => ({ ...s, status: "idle" }));
+    }
+    setModelCacheStatus((s) => ({ ...s, [modelId]: false }));
+  };
+
   const inputStyle = {
     width: "100%",
     padding: "8px 12px",
@@ -511,18 +567,43 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
     fontSize: "13px",
     outline: "none",
   };
+  const labelStyle = {
+    fontSize: "11px",
+    fontWeight: 600,
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    color: "var(--text-tertiary)",
+    display: "block",
+    marginBottom: "6px",
+  };
   const statusDot =
-    aiConfig.status === "connected"
+    apiServerConfig.status === "connected"
       ? "var(--status-green)"
-      : aiConfig.status === "error"
+      : apiServerConfig.status === "error"
         ? "var(--status-red)"
         : "var(--status-gray)";
   const statusLabel =
-    aiConfig.status === "connected"
+    apiServerConfig.status === "connected"
       ? "Connected"
-      : aiConfig.status === "error"
+      : apiServerConfig.status === "error"
         ? "Error"
         : "Not connected";
+
+  const providerBtnStyle = (active) => ({
+    flex: 1,
+    padding: "10px 8px",
+    border: active ? "1.5px solid var(--accent)" : "1.5px solid var(--border)",
+    borderRadius: "8px",
+    background: active ? "var(--accent-subtle)" : "transparent",
+    color: active ? "var(--accent)" : "var(--text-secondary)",
+    fontFamily: "var(--font-ui)",
+    fontSize: "12px",
+    fontWeight: active ? 600 : 400,
+    cursor: "pointer",
+    textAlign: "center",
+    transition: "all 0.15s",
+  });
+
   return (
     <>
       {open && (
@@ -606,107 +687,144 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
             gap: "18px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: "13px", fontWeight: 600 }}>
-                Use Local AI
-              </div>
-              <div
-                style={{
-                  fontSize: "11px",
-                  color: "var(--text-tertiary)",
-                  marginTop: "2px",
-                }}
+          {/* Provider selector */}
+          <div>
+            <label style={labelStyle}>Provider</label>
+            <div style={{ display: "flex", gap: "8px" }}>
+              {webGPUSupported && (
+                <button
+                  type="button"
+                  onClick={() => setAiProvider("browser")}
+                  style={providerBtnStyle(aiProvider === "browser")}
+                >
+                  Browser AI
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setAiProvider("api-server")}
+                style={providerBtnStyle(aiProvider === "api-server")}
               >
-                Connect to Ollama, LM Studio, etc.
-              </div>
+                API Server
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() =>
-                setAiConfig((c) => ({ ...c, enabled: !c.enabled }))
-              }
-              style={{
-                width: 44,
-                height: 24,
-                borderRadius: 12,
-                border: "none",
-                cursor: "pointer",
-                background: aiConfig.enabled
-                  ? "var(--accent)"
-                  : "var(--border)",
-                position: "relative",
-                transition: "background 0.2s",
-              }}
-            >
-              <div
-                style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
-                  background: "#fff",
-                  position: "absolute",
-                  top: 3,
-                  left: aiConfig.enabled ? 23 : 3,
-                  transition: "left 0.2s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                }}
-              />
-            </button>
           </div>
-          {aiConfig.enabled && (
+
+          {/* Browser AI settings */}
+          {aiProvider === "browser" && (
             <>
               <div>
-                <label
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    color: "var(--text-tertiary)",
-                    display: "block",
-                    marginBottom: "6px",
-                  }}
-                >
-                  Service
-                </label>
+                <label style={labelStyle}>Model</label>
                 <select
-                  value={aiConfig.preset}
-                  onChange={(e) => handlePresetChange(e.target.value)}
+                  value={browserAi.modelId}
+                  onChange={(e) => {
+                    setBrowserAi((s) => ({
+                      ...s,
+                      modelId: e.target.value,
+                      status: "idle",
+                    }));
+                    browserAiModule().then((mod) => mod.unloadBrowserAI());
+                  }}
                   style={{ ...inputStyle, cursor: "pointer" }}
                 >
-                  {presetOpts.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {BROWSER_AI_MODELS.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.label}
                     </option>
                   ))}
                 </select>
               </div>
-              <div>
-                <label
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "12px",
+                  color: "var(--text-tertiary)",
+                }}
+              >
+                <span
                   style={{
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    color: "var(--text-tertiary)",
-                    display: "block",
-                    marginBottom: "6px",
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background:
+                      browserAi.status === "ready"
+                        ? "var(--status-green)"
+                        : modelCacheStatus[browserAi.modelId]
+                          ? "var(--status-green)"
+                          : "var(--status-gray)",
+                  }}
+                />
+                {browserAi.status === "ready"
+                  ? "Ready"
+                  : modelCacheStatus[browserAi.modelId]
+                    ? "Cached (loads on generate)"
+                    : "Not downloaded (downloads on first generate)"}
+              </div>
+              {modelCacheStatus[browserAi.modelId] && (
+                <button
+                  type="button"
+                  className="btn-soft"
+                  onClick={() => handleDeleteCache(browserAi.modelId)}
+                  style={{
+                    width: "100%",
+                    padding: "8px",
+                    fontSize: "12px",
                   }}
                 >
-                  Endpoint URL
-                </label>
+                  Remove cached model
+                </button>
+              )}
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "var(--text-tertiary)",
+                  lineHeight: 1.5,
+                  padding: "12px",
+                  background: "var(--surface-elevated)",
+                  borderRadius: "8px",
+                }}
+              >
+                Runs entirely in your browser using WebGPU. The model is
+                downloaded once and cached for offline use.
+              </div>
+            </>
+          )}
+
+          {/* API Server settings */}
+          {aiProvider === "api-server" && (
+            <>
+              <div>
+                <label style={labelStyle}>Service</label>
+                <select
+                  value={apiServerConfig.preset}
+                  onChange={(e) => handlePresetChange(e.target.value)}
+                  style={{ ...inputStyle, cursor: "pointer" }}
+                >
+                  <optgroup label="Self-hosted">
+                    {selfHostedPresets.map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Cloud">
+                    {cloudPresets.map(([k, v]) => (
+                      <option key={k} value={k}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Endpoint URL</label>
                 <input
                   style={inputStyle}
-                  value={aiConfig.baseURL}
+                  value={apiServerConfig.baseURL}
                   onChange={(e) =>
-                    setAiConfig((c) => ({
+                    setApiServerConfig((c) => ({
                       ...c,
                       baseURL: e.target.value,
                       status: "disconnected",
@@ -717,34 +835,29 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
                 />
               </div>
               <div>
-                <label
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    color: "var(--text-tertiary)",
-                    display: "block",
-                    marginBottom: "6px",
-                  }}
-                >
-                  API Key (optional)
-                </label>
+                <label style={labelStyle}>API Key (optional)</label>
                 <input
                   style={inputStyle}
                   type="password"
-                  value={aiConfig.apiKey}
+                  value={apiServerConfig.apiKey}
                   onChange={(e) =>
-                    setAiConfig((c) => ({ ...c, apiKey: e.target.value }))
+                    setApiServerConfig((c) => ({
+                      ...c,
+                      apiKey: e.target.value,
+                    }))
                   }
-                  placeholder="Usually not needed"
+                  placeholder={
+                    AI_PRESETS[apiServerConfig.preset]?.needsKey
+                      ? "Required"
+                      : "Usually not needed"
+                  }
                 />
               </div>
               <button
                 type="button"
                 className="btn-accent"
                 onClick={handleTest}
-                disabled={testing || !aiConfig.baseURL}
+                disabled={testing || !apiServerConfig.baseURL}
                 style={{ width: "100%", padding: "10px", fontSize: "13px" }}
               >
                 {testing ? "Testing..." : "Test Connection"}
@@ -766,29 +879,20 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
                   {testMsg.text}
                 </div>
               )}
-              {aiConfig.models.length > 0 && (
+              {apiServerConfig.models.length > 0 && (
                 <div>
-                  <label
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      color: "var(--text-tertiary)",
-                      display: "block",
-                      marginBottom: "6px",
-                    }}
-                  >
-                    Model
-                  </label>
+                  <label style={labelStyle}>Model</label>
                   <select
                     style={{ ...inputStyle, cursor: "pointer" }}
-                    value={aiConfig.model}
+                    value={apiServerConfig.model}
                     onChange={(e) =>
-                      setAiConfig((c) => ({ ...c, model: e.target.value }))
+                      setApiServerConfig((c) => ({
+                        ...c,
+                        model: e.target.value,
+                      }))
                     }
                   >
-                    {aiConfig.models.map((m) => (
+                    {apiServerConfig.models.map((m) => (
                       <option key={m} value={m}>
                         {m}
                       </option>
@@ -814,17 +918,18 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
                   }}
                 />
                 {statusLabel}
-                {aiConfig.model && aiConfig.status === "connected" && (
-                  <span
-                    style={{
-                      marginLeft: "auto",
-                      fontSize: "11px",
-                      opacity: 0.7,
-                    }}
-                  >
-                    {aiConfig.model}
-                  </span>
-                )}
+                {apiServerConfig.model &&
+                  apiServerConfig.status === "connected" && (
+                    <span
+                      style={{
+                        marginLeft: "auto",
+                        fontSize: "11px",
+                        opacity: 0.7,
+                      }}
+                    >
+                      {apiServerConfig.model}
+                    </span>
+                  )}
               </div>
               <div
                 style={{
@@ -858,18 +963,6 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
               </div>
             </>
           )}
-          {!aiConfig.enabled && (
-            <div
-              style={{
-                fontSize: "12px",
-                color: "var(--text-tertiary)",
-                lineHeight: 1.6,
-              }}
-            >
-              Using the built-in AI model. Enable Local AI to use your own
-              models via Ollama, LM Studio, or any OpenAI-compatible service.
-            </div>
-          )}
         </div>
       </div>
     </>
@@ -879,7 +972,7 @@ function SettingsSidebar({ open, onClose, aiConfig, setAiConfig }) {
 // ─── Main ────────────────────────────────────────────────────
 export default function Dictune() {
   const [lang, setLang] = useState("en");
-  const [level, setLevel] = useState("B1");
+  const [level, setLevel] = useState("medium");
   const [duration, setDuration] = useState(1);
   const [topic, setTopic] = useState("");
   const [originalText, setOriginalText] = useState("");
@@ -893,7 +986,19 @@ export default function Dictune() {
       window.matchMedia?.("(prefers-color-scheme: dark)").matches,
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [aiConfig, setAiConfig] = useState(DEFAULT_AI_CONFIG);
+  const [aiProvider, setAiProvider] = useState("browser");
+  const [webGPUSupported, setWebGPUSupported] = useState(true);
+  const [browserAi, setBrowserAi] = useState({
+    status: "idle",
+    progress: 0,
+    progressText: "",
+    modelId: DEFAULT_BROWSER_MODEL,
+    error: null,
+  });
+  const [downloadConfirm, setDownloadConfirm] = useState(null);
+  const [apiServerConfig, setApiServerConfig] = useState(
+    DEFAULT_API_SERVER_CONFIG,
+  );
   const textareaRef = useRef(null);
   const origRef = useRef(null);
   const [origHeight, setOrigHeight] = useState(160);
@@ -908,26 +1013,84 @@ export default function Dictune() {
     return () => mq.removeEventListener("change", h);
   }, []);
   useEffect(() => {
+    if (!isWebGPUSupported()) {
+      setWebGPUSupported(false);
+      setAiProvider("api-server");
+    }
+  }, []);
+  useEffect(() => {
     if (origRef.current)
       setOrigHeight(Math.max(origRef.current.scrollHeight, 160));
   }, []);
 
+  const doGenerate = useCallback(
+    async (provider) => {
+      setIsGenerating(true);
+      setError(null);
+      setOriginalText("");
+      setTranscription("");
+      setComparisonResult(null);
+      const prompt = buildPrompt(lang, level, duration, topic || undefined);
+      try {
+        let text;
+        if (provider === "browser") {
+          const mod = await browserAiModule();
+          const cached = await mod.isBrowserAIModelCached(browserAi.modelId);
+          setBrowserAi((s) => ({
+            ...s,
+            status: cached ? "loading" : "downloading",
+            error: null,
+          }));
+          await mod.initBrowserAI(
+            browserAi.modelId,
+            ({ progress, text: t }) => {
+              setBrowserAi((s) => ({
+                ...s,
+                progress,
+                progressText: t,
+              }));
+            },
+          );
+          setBrowserAi((s) => ({ ...s, status: "generating" }));
+          text = await mod.generateWithBrowserAI(prompt);
+          setBrowserAi((s) => ({ ...s, status: "ready" }));
+        } else {
+          text = await generateWithLocal(prompt, apiServerConfig);
+        }
+        setOriginalText(text);
+      } catch (e) {
+        setError(e.message);
+        if (provider === "browser") {
+          setBrowserAi((s) => ({
+            ...s,
+            status: "error",
+            error: e.message,
+          }));
+        }
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [lang, level, duration, topic, apiServerConfig, browserAi.modelId],
+  );
+
   const handleGenerate = useCallback(async () => {
-    setIsGenerating(true);
-    setError(null);
-    setOriginalText("");
-    setTranscription("");
-    setComparisonResult(null);
-    try {
-      setOriginalText(
-        await generateText(lang, level, duration, topic || undefined, aiConfig),
-      );
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setIsGenerating(false);
+    if (aiProvider === "browser") {
+      const mod = await browserAiModule();
+      const cached = await mod.isBrowserAIModelCached(browserAi.modelId);
+      if (!cached && browserAi.status !== "ready") {
+        const modelInfo = BROWSER_AI_MODELS.find(
+          (m) => m.id === browserAi.modelId,
+        );
+        setDownloadConfirm({
+          size: modelInfo?.size || "~350MB",
+          label: modelInfo?.label || browserAi.modelId,
+        });
+        return;
+      }
     }
-  }, [lang, level, duration, topic, aiConfig]);
+    doGenerate(aiProvider);
+  }, [aiProvider, browserAi.modelId, browserAi.status, doGenerate]);
   const handleCompare = useCallback(() => {
     if (!transcription.trim()) return;
     setComparisonResult(compareTexts(originalText, transcription, lang));
@@ -1014,9 +1177,91 @@ export default function Dictune() {
       <SettingsSidebar
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        aiConfig={aiConfig}
-        setAiConfig={setAiConfig}
+        aiProvider={aiProvider}
+        setAiProvider={setAiProvider}
+        browserAi={browserAi}
+        setBrowserAi={setBrowserAi}
+        apiServerConfig={apiServerConfig}
+        setApiServerConfig={setApiServerConfig}
+        webGPUSupported={webGPUSupported}
       />
+      {/* Download confirmation dialog */}
+      {downloadConfirm && (
+        <>
+          <div
+            role="presentation"
+            onClick={() => setDownloadConfirm(null)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.4)",
+              zIndex: 70,
+            }}
+          />
+          <div
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+              borderRadius: "16px",
+              padding: "28px",
+              zIndex: 80,
+              maxWidth: "380px",
+              width: "90vw",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "15px",
+                fontWeight: 600,
+                marginBottom: "10px",
+              }}
+            >
+              Download AI model?
+            </div>
+            <div
+              style={{
+                fontSize: "13px",
+                color: "var(--text-secondary)",
+                lineHeight: 1.6,
+                marginBottom: "20px",
+              }}
+            >
+              Download {downloadConfirm.label} for offline use. This only
+              happens once — the model is cached in your browser.
+            </div>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                type="button"
+                className="btn-soft"
+                onClick={() => {
+                  setDownloadConfirm(null);
+                  setAiProvider("api-server");
+                  setSettingsOpen(true);
+                }}
+                style={{ flex: 1, padding: "10px", fontSize: "13px" }}
+              >
+                Use API Server
+              </button>
+              <button
+                type="button"
+                className="btn-accent"
+                onClick={() => {
+                  setDownloadConfirm(null);
+                  doGenerate("browser");
+                }}
+                style={{ flex: 1, padding: "10px", fontSize: "13px" }}
+              >
+                Download & Generate
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       <header
         style={{
           borderBottom: "1px solid var(--border)",
@@ -1180,20 +1425,78 @@ export default function Dictune() {
                 <div
                   style={{
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     flex: 1,
                     minHeight: "80px",
+                    gap: "12px",
                   }}
                 >
-                  <span
-                    className="loading-dots"
-                    style={{ fontSize: "20px", color: "var(--accent)" }}
-                  >
-                    <span>●</span>
-                    <span>●</span>
-                    <span>●</span>
-                  </span>
+                  {browserAi.status === "downloading" &&
+                  aiProvider === "browser" &&
+                  browserAi.progress < 100 ? (
+                    <>
+                      <div
+                        style={{
+                          width: "80%",
+                          maxWidth: "240px",
+                          height: "6px",
+                          borderRadius: "3px",
+                          background: "var(--bar-bg)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${browserAi.progress}%`,
+                            height: "100%",
+                            borderRadius: "3px",
+                            background: "var(--accent)",
+                            transition: "width 0.3s ease",
+                          }}
+                        />
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--text-tertiary)",
+                        }}
+                      >
+                        Downloading{" "}
+                        {BROWSER_AI_MODELS.find(
+                          (m) => m.id === browserAi.modelId,
+                        )?.label || browserAi.modelId}
+                        {"  "}
+                        {browserAi.progress}%
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span
+                        className="loading-dots"
+                        style={{ fontSize: "20px", color: "var(--accent)" }}
+                      >
+                        <span>●</span>
+                        <span>●</span>
+                        <span>●</span>
+                      </span>
+                      {aiProvider === "browser" && (
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "var(--text-tertiary)",
+                          }}
+                        >
+                          Using{" "}
+                          {browserAi.modelId
+                            .replace(/-q4f16_1-MLC$/, "")
+                            .replace("-", " ")}{" "}
+                          to generate...
+                        </span>
+                      )}
+                    </>
+                  )}
                 </div>
               )}
               {!hasText && !isGenerating && (
@@ -1278,7 +1581,11 @@ export default function Dictune() {
                 options={LEVELS}
                 value={level}
                 onChange={setLevel}
-                renderTrigger={(v) => v}
+                renderTrigger={(v) => v.charAt(0).toUpperCase() + v.slice(1)}
+                renderOption={(o) =>
+                  (typeof o === "string" ? o : o).charAt(0).toUpperCase() +
+                  (typeof o === "string" ? o : o).slice(1)
+                }
               />
               <Dropdown
                 options={DURATIONS}

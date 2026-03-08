@@ -1,13 +1,14 @@
 import {
   AI_PRESETS,
-  type AIConfig,
-  type CEFRLevel,
+  type ApiServerConfig,
+  buildPrompt,
   type ComparisonResult,
   compareTexts,
-  DEFAULT_AI_CONFIG,
+  DEFAULT_API_SERVER_CONFIG,
+  type DifficultyLevel,
   type DiffPart,
   DURATIONS,
-  generateText,
+  generateWithLocal,
   LANG_CODES,
   LANGUAGES,
   type LangCode,
@@ -162,14 +163,16 @@ export function App() {
   const { exit } = useApp();
   const [screen, setScreen] = useState<Screen>("lang");
   const [lang, setLang] = useState<LangCode>("en");
-  const [level, setLevel] = useState<CEFRLevel>("B1");
+  const [level, setLevel] = useState<DifficultyLevel>("medium");
   const [duration, setDuration] = useState(1);
   const [topic, setTopic] = useState("");
   const [originalText, setOriginalText] = useState("");
   const [transcription, setTranscription] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ComparisonResult | null>(null);
-  const [aiConfig, setAiConfig] = useState<AIConfig>(DEFAULT_AI_CONFIG);
+  const [aiConfig, setAiConfig] = useState<ApiServerConfig>(
+    DEFAULT_API_SERVER_CONFIG,
+  );
   const [settingsStep, setSettingsStep] = useState<
     "menu" | "preset" | "url" | "key" | "model" | "test"
   >("menu");
@@ -185,13 +188,8 @@ export function App() {
     setTranscription("");
     setResult(null);
     try {
-      const text = await generateText(
-        lang,
-        level,
-        duration,
-        topic || undefined,
-        aiConfig,
-      );
+      const prompt = buildPrompt(lang, level, duration, topic || undefined);
+      const text = await generateWithLocal(prompt, aiConfig);
       setOriginalText(text);
       setScreen("practice");
     } catch (e: any) {
@@ -253,11 +251,11 @@ export function App() {
         <Text dimColor>
           {LANGUAGES[lang].flag} {LANGUAGES[lang].native}
         </Text>
-        <Text bold>Select CEFR level:</Text>
+        <Text bold>Select difficulty:</Text>
         <SelectInput
           items={items}
           onSelect={(item) => {
-            setLevel(item.value as CEFRLevel);
+            setLevel(item.value as DifficultyLevel);
             setScreen("duration");
           }}
         />
@@ -485,28 +483,16 @@ export function App() {
       return (
         <Box flexDirection="column" padding={1}>
           <Text bold color={C.accent}>
-            ⚙ AI Settings
+            ⚙ API Server Settings
           </Text>
           <Box marginTop={1}>
             <Text>
-              Local AI:{" "}
-              {aiConfig.enabled ? (
-                <Text color={C.correct}>Enabled</Text>
-              ) : (
-                <Text dimColor>Disabled</Text>
-              )}{" "}
               {statusDot} {statusText}
             </Text>
           </Box>
           <Box marginTop={1}>
             <SelectInput
               items={[
-                {
-                  label: aiConfig.enabled
-                    ? "Disable Local AI"
-                    : "Enable Local AI",
-                  value: "toggle",
-                },
                 {
                   label: `Service: ${AI_PRESETS[aiConfig.preset]?.name || aiConfig.preset}`,
                   value: "preset",
@@ -531,9 +517,7 @@ export function App() {
                 { label: "← Back", value: "back" },
               ]}
               onSelect={(item) => {
-                if (item.value === "toggle")
-                  setAiConfig((c) => ({ ...c, enabled: !c.enabled }));
-                else if (item.value === "back") setScreen("lang");
+                if (item.value === "back") setScreen("lang");
                 else if (item.value === "test") {
                   setSettingsStep("test");
                   setTestMsg("Testing...");
