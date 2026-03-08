@@ -1319,38 +1319,6 @@ export default function Dictune() {
         <span style={{ flex: 1 }} />
         <button
           type="button"
-          onClick={() => setSettingsOpen(true)}
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            border: "1.5px solid var(--border)",
-            background: "transparent",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "var(--text-tertiary)",
-            flexShrink: 0,
-          }}
-          title="AI Settings"
-        >
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="8" cy="8" r="2.5" />
-            <path d="M13.3 10.2a1.2 1.2 0 00.2 1.3l.1.1a1.5 1.5 0 11-2.1 2.1l-.1-.1a1.2 1.2 0 00-1.3-.2 1.2 1.2 0 00-.7 1.1v.1a1.5 1.5 0 01-3 0v-.1a1.2 1.2 0 00-.8-1.1 1.2 1.2 0 00-1.3.2l-.1.1a1.5 1.5 0 11-2.1-2.1l.1-.1a1.2 1.2 0 00.2-1.3 1.2 1.2 0 00-1.1-.7h-.1a1.5 1.5 0 010-3h.1a1.2 1.2 0 001.1-.8 1.2 1.2 0 00-.2-1.3l-.1-.1a1.5 1.5 0 112.1-2.1l.1.1a1.2 1.2 0 001.3.2h.1a1.2 1.2 0 00.7-1.1v-.1a1.5 1.5 0 013 0v.1a1.2 1.2 0 00.7 1.1 1.2 1.2 0 001.3-.2l.1-.1a1.5 1.5 0 112.1 2.1l-.1.1a1.2 1.2 0 00-.2 1.3v.1a1.2 1.2 0 001.1.7h.1a1.5 1.5 0 010 3h-.1a1.2 1.2 0 00-1.1.7z" />
-          </svg>
-        </button>
-        <button
-          type="button"
           onClick={() => setDark(!dark)}
           style={{
             width: 34,
@@ -1393,6 +1361,38 @@ export default function Dictune() {
               <path d="M13.5 10.8A6.5 6.5 0 015.2 2.5a6 6 0 108.3 8.3z" />
             </svg>
           )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setSettingsOpen(true)}
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "50%",
+            border: "1.5px solid var(--border)",
+            background: "transparent",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--text-tertiary)",
+            flexShrink: 0,
+          }}
+          title="AI Settings"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="8" cy="8" r="2.5" />
+            <path d="M13.3 10.2a1.2 1.2 0 00.2 1.3l.1.1a1.5 1.5 0 11-2.1 2.1l-.1-.1a1.2 1.2 0 00-1.3-.2 1.2 1.2 0 00-.7 1.1v.1a1.5 1.5 0 01-3 0v-.1a1.2 1.2 0 00-.8-1.1 1.2 1.2 0 00-1.3.2l-.1.1a1.5 1.5 0 11-2.1-2.1l.1-.1a1.2 1.2 0 00.2-1.3 1.2 1.2 0 00-1.1-.7h-.1a1.5 1.5 0 010-3h.1a1.2 1.2 0 001.1-.8 1.2 1.2 0 00-.2-1.3l-.1-.1a1.5 1.5 0 112.1-2.1l.1.1a1.2 1.2 0 001.3.2h.1a1.2 1.2 0 00.7-1.1v-.1a1.5 1.5 0 013 0v.1a1.2 1.2 0 00.7 1.1 1.2 1.2 0 001.3-.2l.1-.1a1.5 1.5 0 112.1 2.1l-.1.1a1.2 1.2 0 00-.2 1.3v.1a1.2 1.2 0 001.1.7h.1a1.5 1.5 0 010 3h-.1a1.2 1.2 0 00-1.1.7z" />
+          </svg>
         </button>
       </header>
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px" }}>
