@@ -1,5 +1,5 @@
-import type { LangCode, CEFRLevel, AIConfig } from "./types";
 import { LANGUAGES } from "./config";
+import type { AIConfig, CEFRLevel, LangCode } from "./types";
 
 // ─── Embedded AI (Anthropic API) ─────────────────────────────
 
@@ -22,9 +22,14 @@ export async function generateWithEmbedded(prompt: string): Promise<string> {
 
 // ─── Local AI (OpenAI-compatible) ────────────────────────────
 
-export async function generateWithLocal(prompt: string, config: AIConfig): Promise<string> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (config.apiKey) headers["Authorization"] = `Bearer ${config.apiKey}`;
+export async function generateWithLocal(
+  prompt: string,
+  config: AIConfig,
+): Promise<string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (config.apiKey) headers.Authorization = `Bearer ${config.apiKey}`;
   const res = await fetch(`${config.baseURL}/chat/completions`, {
     method: "POST",
     headers,
@@ -46,7 +51,12 @@ export async function generateWithLocal(prompt: string, config: AIConfig): Promi
 
 // ─── Unified generation with fallback ────────────────────────
 
-export function buildPrompt(lang: LangCode, level: CEFRLevel, durationMin: number, topic?: string): string {
+export function buildPrompt(
+  lang: LangCode,
+  level: CEFRLevel,
+  durationMin: number,
+  topic?: string,
+): string {
   const c = LANGUAGES[lang];
   const wordCount = Math.round(c.wordsPerMin * durationMin);
   return c.prompt(level, wordCount, topic);
@@ -57,7 +67,7 @@ export async function generateText(
   level: CEFRLevel,
   durationMin: number,
   topic: string | undefined,
-  aiConfig: AIConfig
+  aiConfig: AIConfig,
 ): Promise<string> {
   const prompt = buildPrompt(lang, level, durationMin, topic);
 
@@ -76,8 +86,10 @@ export async function generateText(
 // ─── Connection test ─────────────────────────────────────────
 
 export async function testLocalConnection(config: AIConfig): Promise<string[]> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (config.apiKey) headers["Authorization"] = `Bearer ${config.apiKey}`;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (config.apiKey) headers.Authorization = `Bearer ${config.apiKey}`;
   const res = await fetch(`${config.baseURL}/models`, {
     headers,
     signal: AbortSignal.timeout(5000),

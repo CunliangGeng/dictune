@@ -64,7 +64,12 @@ export interface DiffPartSpace {
   type: "space";
 }
 
-export type DiffPart = DiffPartEqual | DiffPartWrong | DiffPartRemoved | DiffPartAdded | DiffPartSpace;
+export type DiffPart =
+  | DiffPartEqual
+  | DiffPartWrong
+  | DiffPartRemoved
+  | DiffPartAdded
+  | DiffPartSpace;
 
 export interface ComparisonResult {
   diff: DiffPart[];
