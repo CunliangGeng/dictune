@@ -1055,7 +1055,20 @@ export default function Dictune() {
           text = await mod.generateWithBrowserAI(prompt);
           setBrowserAi((s) => ({ ...s, status: "ready" }));
         } else {
-          text = await generateWithLocal(prompt, apiServerConfig);
+          let config = apiServerConfig;
+          if (!config.model || config.status !== "connected") {
+            try {
+              const models = await testLocalConnection(config);
+              const model = config.model || models[0] || "";
+              config = { ...config, status: "connected", models, model };
+              setApiServerConfig(config);
+            } catch (connErr) {
+              throw new Error(
+                `Cannot connect to ${AI_PRESETS[config.preset]?.name || config.baseURL}. Check your settings and try again.`,
+              );
+            }
+          }
+          text = await generateWithLocal(prompt, config);
         }
         setOriginalText(text);
       } catch (e) {

@@ -23,7 +23,14 @@ export async function generateWithLocal(
     }),
     signal: AbortSignal.timeout(30000),
   });
-  if (!res.ok) throw new Error(`API Server error: ${res.status}`);
+  if (!res.ok) {
+    if (res.status === 400) {
+      throw new Error(
+        `Model "${config.model}" does not support text generation. Try a different model (e.g. llama, qwen, gemma).`,
+      );
+    }
+    throw new Error(`API Server error: ${res.status}`);
+  }
   const d = await res.json();
   const text = d.choices?.[0]?.message?.content?.trim();
   if (!text) throw new Error("No text returned from API Server");
