@@ -1397,6 +1397,99 @@ export default function Dictune() {
       </header>
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px" }}>
         <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "6px",
+            marginBottom: "12px",
+          }}
+        >
+          <Dropdown
+            options={langOpts}
+            value={lang}
+            onChange={(v) => {
+              setLang(v);
+              handleReset();
+            }}
+            renderTrigger={(v) => `${LANGUAGES[v].flag} ${LANGUAGES[v].native}`}
+            renderOption={(o) => o.label}
+          />
+          <Dropdown
+            options={LEVELS}
+            value={level}
+            onChange={setLevel}
+            renderTrigger={(v) =>
+              ({
+                easy: t.levelEasy,
+                medium: t.levelMedium,
+                hard: t.levelHard,
+              })[v] || v
+            }
+            renderOption={(o) =>
+              ({
+                easy: t.levelEasy,
+                medium: t.levelMedium,
+                hard: t.levelHard,
+              })[o] || o
+            }
+          />
+          <Dropdown
+            options={DURATIONS}
+            value={duration}
+            onChange={setDuration}
+            renderTrigger={(v) => DURATIONS.find((d) => d.value === v)?.label}
+            renderOption={(o) => o.label}
+          />
+          <span
+            style={{
+              width: 1,
+              height: 16,
+              background: "var(--border)",
+              flexShrink: 0,
+              margin: "0 2px",
+            }}
+          />
+          <input
+            className="topic-input"
+            type="text"
+            placeholder={t.topicPlaceholder}
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isGenerating) handleGenerate();
+            }}
+            style={{ flex: 1, minWidth: "120px" }}
+          />
+          <button
+            type="button"
+            className="btn-accent"
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            style={{ padding: "7px 18px", fontSize: "13px", flexShrink: 0 }}
+          >
+            {isGenerating ? (
+              <span className="loading-dots">
+                <span>●</span>
+                <span>●</span>
+                <span>●</span>
+              </span>
+            ) : (
+              <>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path d="M14.5 1.5l-5 14-3-6-6-3 14-5z" />
+                </svg>
+                {t.generate}
+              </>
+            )}
+          </button>
+        </div>
+        <div
           className="main-grid"
           style={{
             display: "grid",
@@ -1523,21 +1616,29 @@ export default function Dictune() {
                     gap: "8px",
                   }}
                 >
-                  <svg
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{ opacity: 0.2 }}
-                  >
-                    <path
-                      d="M4 6h16M4 12h16M4 18h10"
+                  <span>
+                    {t.welcome.split("\n")[0].split("{icon}")[0]}
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 16 16"
+                      fill="none"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="1.4"
                       strokeLinecap="round"
-                    />
-                  </svg>
-                  {t.welcome}
+                      strokeLinejoin="round"
+                      style={{
+                        verticalAlign: "middle",
+                        opacity: 0.5,
+                        margin: "0 2px",
+                      }}
+                    >
+                      <circle cx="8" cy="8" r="2.5" />
+                      <path d="M13.3 10.2a1.2 1.2 0 00.2 1.3l.1.1a1.5 1.5 0 11-2.1 2.1l-.1-.1a1.2 1.2 0 00-1.3-.2 1.2 1.2 0 00-.7 1.1v.1a1.5 1.5 0 01-3 0v-.1a1.2 1.2 0 00-.8-1.1 1.2 1.2 0 00-1.3.2l-.1.1a1.5 1.5 0 11-2.1-2.1l.1-.1a1.2 1.2 0 00.2-1.3 1.2 1.2 0 00-1.1-.7h-.1a1.5 1.5 0 010-3h.1a1.2 1.2 0 001.1-.8 1.2 1.2 0 00-.2-1.3l-.1-.1a1.5 1.5 0 112.1-2.1l.1.1a1.2 1.2 0 001.3.2h.1a1.2 1.2 0 00.7-1.1v-.1a1.5 1.5 0 013 0v.1a1.2 1.2 0 00.7 1.1 1.2 1.2 0 001.3-.2l.1-.1a1.5 1.5 0 112.1 2.1l-.1.1a1.2 1.2 0 00-.2 1.3v.1a1.2 1.2 0 001.1.7h.1a1.5 1.5 0 010 3h-.1a1.2 1.2 0 00-1.1.7z" />
+                    </svg>
+                    {t.welcome.split("\n")[0].split("{icon}")[1]}
+                  </span>
+                  <span>{t.welcome.split("\n")[1]}</span>
                 </div>
               )}
               {hasText && !isCompared && (
@@ -1562,105 +1663,6 @@ export default function Dictune() {
                   />
                 </div>
               )}
-            </div>
-            <div
-              style={{
-                padding: "10px 16px",
-                borderTop: "1px solid var(--border)",
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "center",
-                gap: "6px",
-                marginTop: "auto",
-              }}
-            >
-              <Dropdown
-                options={langOpts}
-                value={lang}
-                onChange={(v) => {
-                  setLang(v);
-                  handleReset();
-                }}
-                renderTrigger={(v) =>
-                  `${LANGUAGES[v].flag} ${LANGUAGES[v].native}`
-                }
-                renderOption={(o) => o.label}
-              />
-              <Dropdown
-                options={LEVELS}
-                value={level}
-                onChange={setLevel}
-                renderTrigger={(v) =>
-                  ({
-                    easy: t.levelEasy,
-                    medium: t.levelMedium,
-                    hard: t.levelHard,
-                  })[v] || v
-                }
-                renderOption={(o) =>
-                  ({
-                    easy: t.levelEasy,
-                    medium: t.levelMedium,
-                    hard: t.levelHard,
-                  })[o] || o
-                }
-              />
-              <Dropdown
-                options={DURATIONS}
-                value={duration}
-                onChange={setDuration}
-                renderTrigger={(v) =>
-                  DURATIONS.find((d) => d.value === v)?.label
-                }
-                renderOption={(o) => o.label}
-              />
-              <span
-                style={{
-                  width: 1,
-                  height: 16,
-                  background: "var(--border)",
-                  flexShrink: 0,
-                  margin: "0 2px",
-                }}
-              />
-              <input
-                className="topic-input"
-                type="text"
-                placeholder={t.topicPlaceholder}
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isGenerating) handleGenerate();
-                }}
-                style={{ minWidth: "100px" }}
-              />
-              <button
-                type="button"
-                className="btn-accent"
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                style={{ padding: "7px 18px", fontSize: "13px", flexShrink: 0 }}
-              >
-                {isGenerating ? (
-                  <span className="loading-dots">
-                    <span>●</span>
-                    <span>●</span>
-                    <span>●</span>
-                  </span>
-                ) : (
-                  <>
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                    >
-                      <path d="M14.5 1.5l-5 14-3-6-6-3 14-5z" />
-                    </svg>
-                    {t.generate}
-                  </>
-                )}
-              </button>
             </div>
           </div>
           <div
