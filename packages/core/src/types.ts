@@ -106,4 +106,7 @@ export interface UIStrings {
   legendMissing: string;
   legendExtra: string;
   legendGap: string;
+  levelEasy: string;
+  levelMedium: string;
+  levelHard: string;
 }

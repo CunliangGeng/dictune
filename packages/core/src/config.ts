@@ -260,6 +260,9 @@ export const UI_STRINGS: Record<LangCode, UIStrings> = {
     legendMissing: "Missing",
     legendExtra: "Extra",
     legendGap: "Gap placeholder",
+    levelEasy: "Beginner",
+    levelMedium: "Intermediate",
+    levelHard: "Advanced",
   },
   nl: {
     generate: "Genereer",
@@ -282,6 +285,9 @@ export const UI_STRINGS: Record<LangCode, UIStrings> = {
     legendMissing: "Ontbreekt",
     legendExtra: "Extra",
     legendGap: "Plaatsaanduiding",
+    levelEasy: "Beginner",
+    levelMedium: "Gemiddeld",
+    levelHard: "Gevorderd",
   },
   zh: {
     generate: "生成",
@@ -304,5 +310,8 @@ export const UI_STRINGS: Record<LangCode, UIStrings> = {
     legendMissing: "缺失",
     legendExtra: "多余",
     legendGap: "占位标记",
+    levelEasy: "初级",
+    levelMedium: "中级",
+    levelHard: "高级",
   },
 };

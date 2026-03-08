@@ -179,6 +179,11 @@ export function App() {
   const [testMsg, setTestMsg] = useState<string | null>(null);
 
   const t = UI_STRINGS[lang];
+  const levelLabel = {
+    easy: t.levelEasy,
+    medium: t.levelMedium,
+    hard: t.levelHard,
+  }[level];
 
   // ── Generate ──
   const doGenerate = useCallback(async () => {
@@ -245,7 +250,12 @@ export function App() {
 
   // ── Level selection ──
   if (screen === "level") {
-    const items = LEVELS.map((l) => ({ label: l, value: l }));
+    const levelLabels = {
+      easy: t.levelEasy,
+      medium: t.levelMedium,
+      hard: t.levelHard,
+    };
+    const items = LEVELS.map((l) => ({ label: levelLabels[l], value: l }));
     return (
       <Box flexDirection="column" padding={1}>
         <Text dimColor>
@@ -272,7 +282,7 @@ export function App() {
     return (
       <Box flexDirection="column" padding={1}>
         <Text dimColor>
-          {LANGUAGES[lang].flag} {LANGUAGES[lang].native} · {level}
+          {LANGUAGES[lang].flag} {LANGUAGES[lang].native} · {levelLabel}
         </Text>
         <Text bold>Select duration:</Text>
         <SelectInput
@@ -291,7 +301,7 @@ export function App() {
     return (
       <Box flexDirection="column" padding={1}>
         <Text dimColor>
-          {LANGUAGES[lang].flag} {LANGUAGES[lang].native} · {level} ·{" "}
+          {LANGUAGES[lang].flag} {LANGUAGES[lang].native} · {levelLabel} ·{" "}
           {DURATIONS.find((d) => d.value === duration)?.label}
         </Text>
         {error && <Text color={C.missing}>Error: {error}</Text>}

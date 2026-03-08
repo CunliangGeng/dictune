@@ -1590,10 +1590,19 @@ export default function Dictune() {
                 options={LEVELS}
                 value={level}
                 onChange={setLevel}
-                renderTrigger={(v) => v.charAt(0).toUpperCase() + v.slice(1)}
+                renderTrigger={(v) =>
+                  ({
+                    easy: t.levelEasy,
+                    medium: t.levelMedium,
+                    hard: t.levelHard,
+                  })[v] || v
+                }
                 renderOption={(o) =>
-                  (typeof o === "string" ? o : o).charAt(0).toUpperCase() +
-                  (typeof o === "string" ? o : o).slice(1)
+                  ({
+                    easy: t.levelEasy,
+                    medium: t.levelMedium,
+                    hard: t.levelHard,
+                  })[o] || o
                 }
               />
               <Dropdown
