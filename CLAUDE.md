@@ -15,6 +15,9 @@ bun run dev:tui              # run TUI directly via Bun
 bun run build:pwa            # production build → packages/pwa/dist/
 bun run build:tui            # bundle TUI → packages/tui/dist/
 bun run typecheck            # typecheck all packages
+bun run lint                 # check lint + formatting (Biome)
+bun run lint:fix             # auto-fix lint + formatting
+bun run format               # format only
 ```
 
 ## Architecture
@@ -55,4 +58,5 @@ Bun workspace monorepo with three packages:
 - All prompts request spoken/conversational style text, not written prose
 - PWA uses `.jsx` (no TypeScript in PWA source files). TUI uses `.tsx`
 - PWA base path is `/dictune/` (for GitHub Pages deployment)
+- **Biome** handles linting and formatting — run `bun run lint:fix` before committing
 - No test framework is set up yet
