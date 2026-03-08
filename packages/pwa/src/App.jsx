@@ -1481,20 +1481,16 @@ export default function Dictune() {
                         <span>●</span>
                         <span>●</span>
                       </span>
-                      {aiProvider === "browser" && (
-                        <span
-                          style={{
-                            fontSize: "12px",
-                            color: "var(--text-tertiary)",
-                          }}
-                        >
-                          Using{" "}
-                          {browserAi.modelId
-                            .replace(/-q4f16_1-MLC$/, "")
-                            .replace("-", " ")}{" "}
-                          to generate...
-                        </span>
-                      )}
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--text-tertiary)",
+                        }}
+                      >
+                        {aiProvider === "browser"
+                          ? `Using ${browserAi.modelId.replace(/-q4f16_1-MLC$/, "").replace("-", " ")} to generate...`
+                          : `Using ${apiServerConfig.model || "API Server"} on ${AI_PRESETS[apiServerConfig.preset]?.name || apiServerConfig.baseURL} to generate...`}
+                      </span>
                     </>
                   )}
                 </div>
