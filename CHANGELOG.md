@@ -23,7 +23,7 @@ Replaced the three-tier AI system (Local AI → hidden Anthropic fallback) with 
 #### 2. Local or Cloud AI (unified)
 - Merged "Local AI" concept with cloud providers into one option
 - **Self-hosted presets**: Ollama, LM Studio, Jan, GPT4All, LocalAI, llama.cpp, vLLM
-- **Cloud presets** (new): OpenAI, Together AI, Groq
+- **Cloud presets** (new): OpenAI, Anthropic, Google Gemini, Mistral AI, DeepSeek, Together AI, Groq
 - Same config: baseURL + apiKey + model
 - Auto-connects and selects a model on first generate (no manual "Test Connection" needed)
 - Helpful error when a non-chat model (e.g. embedding model) is selected

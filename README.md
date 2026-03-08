@@ -27,7 +27,7 @@ bun run dev:tui      # → interactive terminal UI
 ## AI Providers
 
 - **In-browser AI** (PWA only): Runs locally in your browser via WebLLM + WebGPU. Downloads a Qwen3 model (~350MB) once, then works fully offline.
-- **Local or Cloud AI**: Connect to any OpenAI-compatible endpoint — self-hosted (Ollama, LM Studio, Jan, etc.) or cloud (OpenAI, Together AI, Groq, etc.)
+- **Local or Cloud AI**: Connect to any OpenAI-compatible endpoint — self-hosted (Ollama, LM Studio, Jan, etc.) or cloud (OpenAI, Anthropic, Google Gemini, Mistral AI, DeepSeek, Together AI, Groq, etc.)
 
 Configure via Settings (⚙️ in PWA, `[s]` in TUI).
 

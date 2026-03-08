@@ -148,6 +148,10 @@ Presets are grouped into self-hosted and cloud:
 | llama.cpp | `localhost:8081/v1` | Self-hosted |
 | vLLM | `localhost:8000/v1` | Self-hosted |
 | OpenAI | `api.openai.com/v1` | Cloud |
+| Anthropic | `api.anthropic.com/v1/` | Cloud |
+| Google Gemini | `generativelanguage.googleapis.com/v1beta/openai/` | Cloud |
+| Mistral AI | `api.mistral.ai/v1` | Cloud |
+| DeepSeek | `api.deepseek.com/v1` | Cloud |
 | Together AI | `api.together.xyz/v1` | Cloud |
 | Groq | `api.groq.com/openai/v1` | Cloud |
 
