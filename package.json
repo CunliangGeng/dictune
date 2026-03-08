@@ -7,6 +7,12 @@
     "dev:tui": "bun run --filter @dictune/tui dev",
     "build:pwa": "bun run --filter @dictune/pwa build",
     "build:tui": "bun run --filter @dictune/tui build",
-    "typecheck": "bun run --filter '*' typecheck"
+    "typecheck": "bun run --filter '*' typecheck",
+    "lint": "bunx biome check packages/",
+    "lint:fix": "bunx biome check --write packages/",
+    "format": "bunx biome format --write packages/"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.6"
   }
 }
