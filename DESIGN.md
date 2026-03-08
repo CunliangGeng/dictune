@@ -238,7 +238,7 @@ Presets are grouped into self-hosted and cloud:
 | Layer | Technology |
 |-------|-----------|
 | Runtime | Bun |
-| Framework | Ink 5 (React for terminals) |
+| Framework | Ink 6 (React for terminals) |
 | Input | ink-text-input, ink-select-input |
 | Feedback | ink-spinner |
 | Language | TypeScript |
@@ -266,13 +266,13 @@ Bun provides:
                                                      │ Enter
                                                      ▼
 ┌──────────────────────────────┐    ┌──────────────────────────────┐
-│ ╭─ ORIGINAL TEXT ──────────╮ │    │  Results                     │
-│ │ The text appears here... │ │    │  ████████████░░░░ 78%        │
-│ ╰──────────────────────────╯ │    │                              │
-│                              │    │  Total  Correct Wrong Miss   │
-│ Your dictation:              │ →  │   45     35      5    3      │
-│ ❯ _                          │    │                              │
-│                              │    │  ↻ Try Again                 │
+│ ╭─ ORIGINAL ─╮╭─ DICTATION ╮│    │  Results                     │
+│ │ The text   ││ The text   ││    │  ████████████░░░░ 78%        │
+│ │ appears... ││ apears...  ││    │                              │
+│ ╰────────────╯╰────────────╯│    │  Total  Correct Wrong Miss   │
+│                              │ →  │   45     35      5    3      │
+│ Your dictation:              │    │                              │
+│ ❯ _                          │    │  ↻ Try Again                 │
 └──────────────────────────────┘    │  ▸ Generate New              │
                                     │  ← Change settings           │
                                     │  ✕ Quit                      │
@@ -303,12 +303,15 @@ Accessible via `[s]` from the language selection screen. Multi-step menu:
 
 Note: TUI only supports Local or Cloud AI (no in-browser AI). The `doGenerate` function calls `buildPrompt()` + `generateWithLocal()` directly.
 
-### 5.6 Running
+### 5.6 Devcontainer Support
+
+When running inside a devcontainer (`DEVCONTAINER=true` env var), all self-hosted AI preset URLs automatically use `host.docker.internal` instead of `localhost`, so the TUI can reach AI servers running on the host machine.
+
+### 5.7 Running
 
 ```bash
-# Development
-cd packages/tui
-bun run dev          # or: bun run src/cli.tsx
+# Development (uses --cwd to preserve TTY raw mode for Ink)
+bun run dev:tui      # from repo root
 
 # Build standalone
 bun run build        # → dist/cli.js

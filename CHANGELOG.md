@@ -1,5 +1,31 @@
 # Changelog
 
+## TUI Improvements (2026-03-08)
+
+### Ink v6 Upgrade
+- Upgraded Ink from v5 to v6 for **React 19 compatibility** — Ink 5 used `react-reconciler@0.29` (React 18), causing version mismatches
+
+### Side-by-Side Diff Panels
+- Results screen now shows ORIGINAL and DICTATION panels **side-by-side** instead of stacked vertically, making it easier to compare differences at a glance
+
+### Dev Script Fix
+- Changed `dev:tui` from `bun run --filter` to `bun run --cwd` to preserve **TTY raw mode**, which Ink needs for keyboard input
+
+### Devcontainer Support
+- AI preset URLs automatically use `host.docker.internal` instead of `localhost` when running inside a devcontainer (`DEVCONTAINER=true` env var)
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/tui/package.json` | Ink v5 → v6 |
+| `packages/tui/src/App.tsx` | Side-by-side diff layout |
+| `package.json` | `dev:tui` uses `--cwd` for TTY raw mode |
+| `packages/core/src/config.ts` | Devcontainer host detection for AI preset URLs |
+| `bun.lock` | Updated dependencies |
+
+---
+
 ## Browser-Based AI & Provider Unification (2026-03-08)
 
 ### Problem

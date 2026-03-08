@@ -10,7 +10,7 @@ Practice by reading AI-generated texts aloud using your OS dictation, then compa
 |---------|-------------|-------|
 | `@dictune/core` | Shared logic (diff engine, AI, config) | TypeScript |
 | `@dictune/pwa` | Installable web app | Vite + React + PWA |
-| `@dictune/tui` | Terminal interface | Ink + Bun |
+| `@dictune/tui` | Terminal interface | Ink 6 + Bun |
 
 ## Quick Start
 
