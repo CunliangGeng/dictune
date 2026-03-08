@@ -19,20 +19,22 @@ export const LANGUAGES: Record<LangCode, LanguageConfig> = {
     prompt: (level, length, topic) => {
       const sentences = Math.max(3, Math.round(length / 12));
       const diff = {
-        easy: "Use ONLY simple, common words (like: go, eat, big, happy, house, water). Use short sentences (5-8 words each). Use only present tense. No idioms, no phrasal verbs, no complex grammar.",
+        easy: "Use ONLY simple, common words. Use short sentences (8-15 words each). Use only present tense. No idioms, no phrasal verbs, no complex grammar.",
         medium:
-          "Use everyday vocabulary with some less common words. Mix short and medium sentences (8-15 words). Use present, past, and future tenses. You may use common phrasal verbs and simple idioms.",
+          "Use everyday vocabulary with some less common words. Mix short and medium sentences (10-20 words). Use present, past, and future tenses. You may use common phrasal verbs and simple idioms.",
         hard: "Use rich vocabulary including advanced words, idioms, and phrasal verbs. Use complex sentences with clauses, varied tenses, and nuanced expressions. The text should challenge a fluent speaker.",
       }[level];
-      return `Write exactly ${sentences} sentences in English about "${topic || "general daily life"}". The total length must be close to ${length} words. Do not write more or fewer than ${sentences} sentences.
+      return `Write a coherent paragraph of exactly ${sentences} sentences in English about "${topic || "general daily life"}". The total length must be close to ${length} words. Do not write more or fewer than ${sentences} sentences.
+
+COHERENCE: The sentences must form a connected story, conversation, or narrative — NOT a random list of unrelated sentences. Each sentence should follow naturally from the previous one. The paragraph should have a beginning, middle, and end.
 
 DIFFICULTY: ${diff}
 
-STYLE: Natural SPOKEN style — like a conversation, story, or voice message. Use contractions (I'm, don't, we've). Sound like real speech.
+STYLE: Natural SPOKEN style — like someone telling a story or leaving a voice message. Do NOT use contractions (I'm, don't, we've). Write in complete, full sentences — not fragments or isolated words.
 
 LANGUAGE: Every single word must be in English. Do NOT mix in any other language. No foreign words, no translations.
 
-Output ONLY the ${sentences} sentences. Nothing else.`;
+Output ONLY the paragraph. Nothing else.`;
     },
   },
   nl: {
@@ -43,20 +45,22 @@ Output ONLY the ${sentences} sentences. Nothing else.`;
     prompt: (level, length, topic) => {
       const sentences = Math.max(3, Math.round(length / 11));
       const diff = {
-        easy: "Gebruik ALLEEN eenvoudige, veelvoorkomende woorden. Gebruik korte zinnen (5-8 woorden). Gebruik alleen tegenwoordige tijd. Geen spreekwoorden, geen moeilijke grammatica.",
+        easy: "Gebruik ALLEEN eenvoudige, veelvoorkomende woorden. Gebruik korte zinnen (8-15 woorden). Gebruik alleen tegenwoordige tijd. Geen spreekwoorden, geen moeilijke grammatica.",
         medium:
-          "Gebruik alledaagse woordenschat met enkele minder gebruikelijke woorden. Mix korte en middellange zinnen (8-15 woorden). Gebruik tegenwoordige, verleden en toekomende tijd.",
+          "Gebruik alledaagse woordenschat met enkele minder gebruikelijke woorden. Mix korte en middellange zinnen (10-20 woorden). Gebruik tegenwoordige, verleden en toekomende tijd.",
         hard: "Gebruik rijke woordenschat met geavanceerde woorden, uitdrukkingen en spreekwoorden. Gebruik complexe zinnen met bijzinnen en gevarieerde tijden.",
       }[level];
-      return `Schrijf precies ${sentences} zinnen in het Nederlands over "${topic || "dagelijks leven"}". De totale lengte moet ongeveer ${length} woorden zijn. Schrijf niet meer of minder dan ${sentences} zinnen.
+      return `Schrijf een samenhangende alinea van precies ${sentences} zinnen in het Nederlands over "${topic || "dagelijks leven"}". De totale lengte moet ongeveer ${length} woorden zijn. Schrijf niet meer of minder dan ${sentences} zinnen.
+
+SAMENHANG: De zinnen moeten samen een verbonden verhaal, gesprek of vertelling vormen — GEEN willekeurige losse zinnen. Elke zin moet logisch volgen op de vorige. De alinea moet een begin, midden en einde hebben.
 
 MOEILIJKHEID: ${diff}
 
-STIJL: Natuurlijke SPREEKSTIJL — als een gesprek, verhaal, of voicemail. Klink als echt gesproken Nederlands.
+STIJL: Natuurlijke SPREEKSTIJL — alsof je een verhaal vertelt of een voicemail inspreekt. Schrijf in volledige, hele zinnen — geen losse woorden of fragmenten.
 
 TAAL: Elk woord moet in het Nederlands zijn. Gebruik GEEN Engelse of andere buitenlandse woorden. Geen vertalingen, geen codeswitching.
 
-Geef ALLEEN de ${sentences} zinnen. Niets anders.`;
+Geef ALLEEN de alinea. Niets anders.`;
     },
   },
   zh: {
@@ -67,20 +71,22 @@ Geef ALLEEN de ${sentences} zinnen. Niets anders.`;
     prompt: (level, length, topic) => {
       const sentences = Math.max(3, Math.round(length / 18));
       const diff = {
-        easy: "只用最简单常见的汉字和词语（如：吃、喝、大、小、开心、家）。用短句（5-10个字一句）。只用现在时。不用成语、不用复杂语法。",
+        easy: "只用简单常见的汉字和词语。用短句（8-15个字一句）。只用现在时。不用成语、不用复杂语法。",
         medium:
           "使用日常词汇，可以加入一些不太常见的词。句子长短混合（10-20个字）。可以使用过去和将来的表达。可以用常见的口语表达。",
         hard: "使用丰富的词汇，包括成语、俗语和高级表达。使用复杂句式、多种时态和细腻的表达方式。文本应该对流利的说话者有挑战性。",
       }[level];
-      return `写正好${sentences}句中文，关于"${topic || "日常生活"}"。总长度必须接近${length}个字。不要多写或少写。
+      return `写一段连贯的中文段落，正好${sentences}句话，关于"${topic || "日常生活"}"。总长度必须接近${length}个字。不要多写或少写。
+
+连贯性：所有句子必须组成一个完整的故事、对话或叙述——不是随机的、互不相关的句子。每句话都要自然地承接上一句。段落要有开头、中间和结尾。
 
 难度要求：${diff}
 
-风格：自然口语风格——像聊天、讲故事或发语音消息。读出来像真实的说话。
+风格：自然口语风格——像在讲一个故事或发语音消息。要用完整的句子，不要只写几个零散的词语或片段。
 
 语言：每个字都必须是中文。绝对不要混入英文或其他语言。不要夹杂外语单词、翻译或注释。
 
-只输出这${sentences}句话。不要其他任何内容。`;
+只输出这段话。不要其他任何内容。`;
     },
   },
 };
