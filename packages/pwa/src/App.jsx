@@ -1501,9 +1501,8 @@ export default function Dictune() {
           <div
             style={{
               background: "var(--surface)",
-              borderRadius: "14px 14px 0 0",
+              borderRadius: "14px",
               border: "1px solid var(--border)",
-              borderBottom: "none",
               overflow: "visible",
               display: "flex",
               flexDirection: "column",
@@ -1668,7 +1667,7 @@ export default function Dictune() {
           <div
             style={{
               background: "var(--surface)",
-              borderRadius: "0 0 14px 14px",
+              borderRadius: "14px",
               border: "1px solid var(--border)",
               opacity: hasText ? 1 : 0.4,
               transition: "all 0.3s ease",
