@@ -24,8 +24,8 @@
   "postCreateCommand": {
     "zsh-custom": "bash /workspace/.devcontainer/zsh-custom.sh",
     "claude-code": "curl -fsSL https://claude.ai/install.sh | bash",
-    "install-deps": "cd /workspace && bun install",
-    "install-lsp": "bun install -g typescript-language-server"
+    "install-deps": "cd /workspace && ~/.bun/bin/bun install",
+    "install-lsp": "~/.bun/bin/bun install -g typescript-language-server"
   },
   "waitFor": "postCreateCommand",
   "customizations": {
