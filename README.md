@@ -24,10 +24,10 @@ bun run dev:pwa      # → http://localhost:5173/dictune/
 bun run dev:tui      # → interactive terminal UI
 ```
 
-## AI Sources
+## AI Providers
 
-- **Built-in**: Anthropic API (requires internet)
-- **Local**: Ollama, LM Studio, Jan, or any OpenAI-compatible service
+- **In-browser AI** (PWA only): Runs locally in your browser via WebLLM + WebGPU. Downloads a Qwen3 model (~350MB) once, then works fully offline.
+- **Local or Cloud AI**: Connect to any OpenAI-compatible endpoint — self-hosted (Ollama, LM Studio, Jan, etc.) or cloud (OpenAI, Together AI, Groq, etc.)
 
 Configure via Settings (⚙️ in PWA, `[s]` in TUI).
 

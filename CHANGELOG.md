@@ -1,0 +1,93 @@
+# Changelog
+
+## Browser-Based AI & Provider Unification (2026-03-08)
+
+### Problem
+
+The PWA relied on a hidden Anthropic API fallback when no local AI server was configured, meaning it couldn't work offline. Users had no control over which AI provider was used — the app silently fell back without telling them.
+
+### Solution
+
+Replaced the three-tier AI system (Local AI → hidden Anthropic fallback) with two explicit, user-controlled providers:
+
+#### 1. In-browser AI (new)
+- **WebLLM** — runs AI inference entirely in the browser using WebGPU
+- **Qwen3 models** — two options selectable in settings:
+  - Qwen3 0.6B (~350MB, default) — fast download, good multilingual quality
+  - Qwen3 1.7B (~1GB) — higher quality
+- Model downloaded once, cached in browser for offline use
+- First-time download shows confirmation dialog with model name and size
+- Progress bar during download, status text during generation
+- `/no_think` system message + regex fallback to strip Qwen3's `<think>` tags
+
+#### 2. Local or Cloud AI (unified)
+- Merged "Local AI" concept with cloud providers into one option
+- **Self-hosted presets**: Ollama, LM Studio, Jan, GPT4All, LocalAI, llama.cpp, vLLM
+- **Cloud presets** (new): OpenAI, Together AI, Groq
+- Same config: baseURL + apiKey + model
+- Auto-connects and selects a model on first generate (no manual "Test Connection" needed)
+- Helpful error when a non-chat model (e.g. embedding model) is selected
+
+#### Removed
+- Hidden embedded Anthropic API fallback — no more silent behavior
+- `generateWithEmbedded()` and `generateText()` unified function from core
+- `AIConfig.enabled` toggle — provider selection is now explicit
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/pwa/src/browser-ai.js` | **New** — WebLLM wrapper with lazy dynamic imports |
+| `packages/core/src/ai.ts` | Removed Anthropic fallback, kept `generateWithLocal` + `buildPrompt` |
+| `packages/core/src/types.ts` | Renamed `AIConfig` → `ApiServerConfig`, added `DifficultyLevel`, added `group` to `AIPreset` |
+| `packages/core/src/config.ts` | Added cloud presets, default topics, difficulty-based prompts |
+| `packages/pwa/src/App.jsx` | Redesigned settings sidebar, new provider selector, download dialog, progress UI |
+| `packages/pwa/package.json` | Added `@mlc-ai/web-llm` dependency |
+| `packages/pwa/vite.config.js` | WebLLM code-splitting, Workbox cache limit increase |
+| `packages/tui/src/App.tsx` | Updated to use new core API (`ApiServerConfig`, `buildPrompt`, `generateWithLocal`) |
+
+---
+
+## Difficulty Levels & Prompt Improvements (2026-03-08)
+
+### Problem
+
+CEFR levels (A1–C2) weren't effective — small models like Qwen3-0.6B don't understand abstract language proficiency standards, so generated text didn't vary meaningfully between levels.
+
+### Solution
+
+Replaced CEFR with **Easy / Medium / Hard** using concrete prompt constraints:
+
+| Level | Constraints |
+|-------|------------|
+| **Easy** | Simple common words only, short sentences (5–8 words), present tense, no idioms |
+| **Medium** | Everyday vocabulary with some less common words, mixed sentence lengths (8–15 words), multiple tenses |
+| **Hard** | Rich vocabulary, idioms, complex sentences with clauses, varied tenses |
+
+### Other Prompt Improvements
+
+- **Sentence counts**: Prompts now specify exact sentence counts (e.g. "Write exactly 6 sentences") instead of vague word counts — small models follow this much better
+- **Random default topics**: When no topic is provided, a random topic is picked from a list (cats, cooking, travel, etc.) instead of generic "daily life"
+- **Single-language enforcement**: Each prompt explicitly forbids mixing languages
+- **Generation status**: Shows which model/server is being used during generation (e.g. "Using llama3 on Ollama to generate...")
+
+---
+
+## UX Flow
+
+### In-browser AI — First Use
+1. User clicks "Generate"
+2. Dialog: "Download Qwen3 0.6B (~350MB) for offline use?" → "Download & Generate" / "Use Local or Cloud AI"
+3. Download progress bar with percentage
+4. Text generates, model stays cached
+
+### In-browser AI — Subsequent Use
+1. User clicks "Generate"
+2. Loading dots + "Using Qwen3 0.6B to generate..."
+3. Text appears
+
+### Local or Cloud AI
+1. User selects provider in settings (or app auto-connects on generate)
+2. Clicks "Generate" → auto-connects if needed, selects model, generates
+3. Shows "Using llama3 on Ollama to generate..." during generation
+4. On error: clear message shown (no silent fallback)
