@@ -1,3 +1,4 @@
+import { useRegisterSW } from "virtual:pwa-register/react";
 import {
   AI_PRESETS,
   buildPrompt,
@@ -969,6 +970,110 @@ function SettingsSidebar({
         </div>
       </div>
     </>
+  );
+}
+
+// ─── Update Toast ─────────────────────────────────────────────
+
+function UpdateToast({ lang }) {
+  const t = UI_STRINGS[lang];
+
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    offlineReady: [offlineReady, setOfflineReady],
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegisteredSW(_swUrl, registration) {
+      if (!registration) return;
+      setInterval(() => registration.update(), 60 * 60 * 1000);
+    },
+  });
+
+  useEffect(() => {
+    if (!offlineReady) return;
+    const timer = setTimeout(() => setOfflineReady(false), 4000);
+    return () => clearTimeout(timer);
+  }, [offlineReady, setOfflineReady]);
+
+  const visible = needRefresh || offlineReady;
+  if (!visible) return null;
+
+  const message = needRefresh ? t.updateAvailable : t.offlineReady;
+
+  return (
+    <div
+      className="fade-in"
+      style={{
+        position: "fixed",
+        bottom: 24,
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 45,
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: 12,
+        boxShadow: "var(--shadow-dropdown)",
+        padding: "12px 16px",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        maxWidth: "calc(100vw - 48px)",
+      }}
+    >
+      <span
+        style={{
+          fontSize: 13,
+          color: "var(--text-primary)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {message}
+      </span>
+      {needRefresh && (
+        <button
+          type="button"
+          className="btn-accent"
+          onClick={() => updateServiceWorker(true)}
+          style={{ padding: "6px 14px", fontSize: 12, flexShrink: 0 }}
+        >
+          {t.reload}
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => {
+          if (needRefresh) setNeedRefresh(false);
+          if (offlineReady) setOfflineReady(false);
+        }}
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: "50%",
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          color: "var(--text-tertiary)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          padding: 0,
+        }}
+        title="Dismiss"
+      >
+        <svg
+          width={12}
+          height={12}
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+        >
+          <path d="M4 4l8 8M12 4l-8 8" />
+        </svg>
+      </button>
+    </div>
   );
 }
 
@@ -1949,6 +2054,7 @@ export default function Dictune() {
           </div>
         )}
       </main>
+      <UpdateToast lang={lang} />
     </div>
   );
 }

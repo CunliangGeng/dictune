@@ -17,7 +17,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "autoUpdate",
+      registerType: "prompt",
       includeAssets: ["favicon.svg", "logo.svg", "wordmark.svg"],
       manifest: {
         name: "Dictune — Pronunciation Practice",
