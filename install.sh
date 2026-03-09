@@ -77,7 +77,7 @@ echo "Detected platform: ${os}-${arch}"
 echo "Fetching latest release..."
 tag=""
 if [ "$DOWNLOADER" = "curl" ]; then
-    tag=$(curl -fsSL -w '%{redirect_url}' -o /dev/null "https://github.com/$REPO/releases/latest" 2>/dev/null | grep -oE '[^/]+$') || true
+    tag=$(curl -fsS -w '%{redirect_url}' -o /dev/null "https://github.com/$REPO/releases/latest" 2>/dev/null | grep -oE '[^/]+$') || true
 else
     tag=$(wget --server-response --max-redirect=0 "https://github.com/$REPO/releases/latest" 2>&1 | grep -i location | grep -oE '[^/]+$' | tr -d '\r') || true
 fi
