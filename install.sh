@@ -75,14 +75,15 @@ echo "Detected platform: ${os}-${arch}"
 
 # Get latest release tag
 echo "Fetching latest release..."
+tag=""
 if [ "$DOWNLOADER" = "curl" ]; then
-    tag=$(curl -fsSL -w '%{redirect_url}' -o /dev/null "https://github.com/$REPO/releases/latest" | grep -oE '[^/]+$')
+    tag=$(curl -fsSL -w '%{redirect_url}' -o /dev/null "https://github.com/$REPO/releases/latest" 2>/dev/null | grep -oE '[^/]+$') || true
 else
-    tag=$(wget --server-response --max-redirect=0 "https://github.com/$REPO/releases/latest" 2>&1 | grep -i location | grep -oE '[^/]+$' | tr -d '\r')
+    tag=$(wget --server-response --max-redirect=0 "https://github.com/$REPO/releases/latest" 2>&1 | grep -i location | grep -oE '[^/]+$' | tr -d '\r') || true
 fi
 
 if [ -z "$tag" ]; then
-    echo "Error: could not determine latest release." >&2
+    echo "Error: no releases found. Visit https://github.com/$REPO/releases for details." >&2
     exit 1
 fi
 echo "Latest release: $tag"
