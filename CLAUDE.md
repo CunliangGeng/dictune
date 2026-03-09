@@ -11,6 +11,7 @@ Dictune helps you to find the best dictation tool for your voice. Users generate
 ```bash
 bun install                  # install all workspace deps
 bun run dev:pwa              # Vite dev server at localhost:5173/dictune/
+# Use --host to expose on network: cd packages/pwa && bunx vite --host
 bun run dev:tui              # run TUI directly via Bun
 bun run build:pwa            # production build → packages/pwa/dist/
 bun run build:tui            # bundle TUI → packages/tui/dist/
