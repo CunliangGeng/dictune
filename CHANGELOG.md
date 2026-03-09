@@ -1,5 +1,44 @@
 # Changelog
 
+## Security, CLI Commands & Docs (2026-03-09)
+
+### API Key Security
+
+- **HTTPS enforcement** — `assertSecureForApiKey()` in `core/ai.ts` refuses to send API keys over unencrypted HTTP, except to localhost/Docker internal addresses
+- Applied to both `generateWithLocal()` and `testLocalConnection()`
+- Fixed `testLocalConnection()` model list parsing — replaced `any` type with proper `{ id?: string }` and filters out entries without valid string IDs
+
+### PWA Accessibility
+
+- Settings sidebar: added `role="dialog"`, `aria-modal`, `aria-labelledby` attributes
+- Form inputs: added `htmlFor`/`id` pairs for Endpoint URL and API Key labels
+- Topic input: added `aria-label`
+
+### TUI CLI Commands
+
+- `dictune --help` / `-h` — shows usage and available commands
+- `dictune --version` / `-v` — prints current version from package.json
+- `dictune update` — self-update by running the install script
+
+### README & Docs
+
+- Added centered logo-wordmark header to README
+- Added PWA install instructions (Chrome/Edge/Safari)
+- Added terminal app install command (`curl | bash`) and GitHub Releases link
+- Updated DESIGN.md to v7 with all recent changes
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/core/src/ai.ts` | API key HTTPS security check, typed model list parsing |
+| `packages/pwa/src/App.jsx` | Accessibility attributes on settings sidebar and form inputs |
+| `packages/tui/src/cli.tsx` | `--help`, `--version`, `update` command handling |
+| `README.md` | Logo, install instructions, PWA screenshot |
+| `DESIGN.md` | Updated to v7 |
+
+---
+
 ## Rebranding & TUI Overhaul (2026-03-09)
 
 ### App Rebranding
