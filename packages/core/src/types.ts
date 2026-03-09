@@ -112,4 +112,14 @@ export interface UIStrings {
   updateAvailable: string;
   offlineReady: string;
   reload: string;
+  tagline: string;
+  selectLanguage: string;
+  selectDifficulty: string;
+  selectDuration: string;
+  settings: string;
+  back: string;
+  quit: string;
+  enterToSkip: string;
+  enterToCompare: string;
+  generatingText: string;
 }
