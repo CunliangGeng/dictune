@@ -243,7 +243,7 @@ export function App() {
   }, [screen]);
 
   // ── Key handler for global shortcuts ──
-  useInput((input, _key) => {
+  useInput((input, key) => {
     if (input === "q" && (screen === "lang" || screen === "results")) exit();
     if (
       input === "s" &&
@@ -253,6 +253,15 @@ export function App() {
       screen !== "generating"
     ) {
       openSettings();
+    }
+
+    // Back navigation with [b] for selection screens, Escape for text-input screens
+    if (input === "b" && screen === "level") setScreen("lang");
+    if (input === "b" && screen === "duration") setScreen("level");
+    if (key.escape && screen === "topic") setScreen("duration");
+    if (key.escape && screen === "practice") {
+      setTranscription("");
+      setScreen("topic");
     }
 
     // Number shortcuts for selection screens
@@ -304,9 +313,9 @@ export function App() {
           <Text bold color={C.accent}>
             ◉ Dictune
           </Text>
-          <Text dimColor> — Pronunciation clarity practice</Text>
+          <Text dimColor> — {t.tagline}</Text>
         </Box>
-        <Text bold>Select language:</Text>
+        <Text bold>{t.selectLanguage}</Text>
         <SelectInput
           items={items}
           onSelect={(item) => {
@@ -315,7 +324,9 @@ export function App() {
           }}
         />
         <Box marginTop={1}>
-          <Text dimColor>[s] Settings [q] Quit</Text>
+          <Text dimColor>
+            [s] {t.settings} [q] {t.quit}
+          </Text>
         </Box>
       </Box>
     );
@@ -337,7 +348,7 @@ export function App() {
         <Text dimColor>
           {LANGUAGES[lang].flag} {LANGUAGES[lang].native}
         </Text>
-        <Text bold>Select difficulty:</Text>
+        <Text bold>{t.selectDifficulty}</Text>
         <SelectInput
           items={items}
           onSelect={(item) => {
@@ -346,7 +357,9 @@ export function App() {
           }}
         />
         <Box marginTop={1}>
-          <Text dimColor>[s] Settings</Text>
+          <Text dimColor>
+            [b] {t.back} [s] {t.settings}
+          </Text>
         </Box>
       </Box>
     );
@@ -363,7 +376,7 @@ export function App() {
         <Text dimColor>
           {LANGUAGES[lang].flag} {LANGUAGES[lang].native} · {levelLabel}
         </Text>
-        <Text bold>Select duration:</Text>
+        <Text bold>{t.selectDuration}</Text>
         <SelectInput
           items={items}
           onSelect={(item) => {
@@ -372,7 +385,9 @@ export function App() {
           }}
         />
         <Box marginTop={1}>
-          <Text dimColor>[s] Settings</Text>
+          <Text dimColor>
+            [b] {t.back} [s] {t.settings}
+          </Text>
         </Box>
       </Box>
     );
@@ -396,8 +411,11 @@ export function App() {
             value={topic}
             onChange={setTopic}
             onSubmit={() => doGenerate()}
-            placeholder="Enter ↵ to skip"
+            placeholder={t.enterToSkip}
           />
+        </Box>
+        <Box marginTop={1}>
+          <Text dimColor>[Esc] {t.back}</Text>
         </Box>
       </Box>
     );
@@ -411,7 +429,7 @@ export function App() {
           <Text color={C.accent}>
             <Spinner type="dots" />
           </Text>
-          <Text> Generating practice text...</Text>
+          <Text> {t.generatingText}</Text>
         </Box>
         {genStatus && (
           <Box marginTop={0}>
@@ -453,8 +471,11 @@ export function App() {
               onSubmit={() => {
                 if (transcription.trim()) doCompare();
               }}
-              placeholder={`Enter ↵ to ${t.compare.toLowerCase()}`}
+              placeholder={t.enterToCompare}
             />
+          </Box>
+          <Box marginTop={1}>
+            <Text dimColor>[Esc] {t.back}</Text>
           </Box>
         </Box>
       </Box>
@@ -558,9 +579,9 @@ export function App() {
             items={[
               { label: `[r] ${t.tryAgain}`, value: "retry" },
               { label: `[n] ${t.generateNew}`, value: "new" },
-              { label: "[s] Settings", value: "settings" },
-              { label: "[b] Back", value: "setup" },
-              { label: "[q] Quit", value: "quit" },
+              { label: `[s] ${t.settings}`, value: "settings" },
+              { label: `[b] ${t.back}`, value: "setup" },
+              { label: `[q] ${t.quit}`, value: "quit" },
             ]}
             onSelect={(item) => {
               if (item.value === "retry") {
