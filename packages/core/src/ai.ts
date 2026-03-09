@@ -3,10 +3,33 @@ import type { ApiServerConfig, DifficultyLevel, LangCode } from "./types";
 
 // ─── API Server (OpenAI-compatible) ─────────────────────────
 
+function assertSecureForApiKey(baseURL: string, apiKey: string): void {
+  if (!apiKey) return;
+  try {
+    const url = new URL(baseURL);
+    if (url.protocol === "https:") return;
+    const h = url.hostname;
+    if (
+      h === "localhost" ||
+      h === "127.0.0.1" ||
+      h === "::1" ||
+      h === "[::1]" ||
+      h === "host.docker.internal"
+    )
+      return;
+    throw new Error(
+      "Refusing to send API key over unencrypted HTTP. Use HTTPS or remove the API key.",
+    );
+  } catch (e) {
+    if (e instanceof Error && e.message.startsWith("Refusing")) throw e;
+  }
+}
+
 export async function generateWithLocal(
   prompt: string,
   config: ApiServerConfig,
 ): Promise<string> {
+  assertSecureForApiKey(config.baseURL, config.apiKey);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -57,6 +80,7 @@ export function buildPrompt(
 export async function testLocalConnection(
   config: ApiServerConfig,
 ): Promise<string[]> {
+  assertSecureForApiKey(config.baseURL, config.apiKey);
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -67,5 +91,7 @@ export async function testLocalConnection(
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const d = await res.json();
-  return (d.data || []).map((m: any) => m.id);
+  return (d.data || [])
+    .map((m: { id?: string }) => m.id)
+    .filter((id: unknown): id is string => typeof id === "string");
 }

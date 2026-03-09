@@ -626,6 +626,9 @@ function SettingsSidebar({
         />
       )}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
         style={{
           position: "fixed",
           top: 0,
@@ -653,7 +656,12 @@ function SettingsSidebar({
             justifyContent: "space-between",
           }}
         >
-          <span style={{ fontSize: "15px", fontWeight: 600 }}>AI Settings</span>
+          <span
+            id="settings-title"
+            style={{ fontSize: "15px", fontWeight: 600 }}
+          >
+            AI Settings
+          </span>
           <button
             type="button"
             onClick={onClose}
@@ -823,8 +831,11 @@ function SettingsSidebar({
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Endpoint URL</label>
+                <label htmlFor="settings-endpoint-url" style={labelStyle}>
+                  Endpoint URL
+                </label>
                 <input
+                  id="settings-endpoint-url"
                   style={inputStyle}
                   value={apiServerConfig.baseURL}
                   onChange={(e) =>
@@ -839,8 +850,11 @@ function SettingsSidebar({
                 />
               </div>
               <div>
-                <label style={labelStyle}>API Key (optional)</label>
+                <label htmlFor="settings-api-key" style={labelStyle}>
+                  API Key (optional)
+                </label>
                 <input
+                  id="settings-api-key"
                   style={inputStyle}
                   type="password"
                   value={apiServerConfig.apiKey}
@@ -1571,6 +1585,7 @@ export default function Dictune() {
           <input
             className="topic-input"
             type="text"
+            aria-label={t.topicPlaceholder}
             placeholder={t.topicPlaceholder}
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
@@ -1885,6 +1900,11 @@ export default function Dictune() {
                   </span>
                 </div>
                 <div
+                  role="progressbar"
+                  aria-valuenow={comparisonResult.accuracy}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={t.accuracy}
                   style={{
                     width: "100%",
                     height: "10px",
