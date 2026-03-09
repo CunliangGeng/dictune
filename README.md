@@ -1,36 +1,34 @@
-# Dictune
+<p align="center">
+  <img src="packages/pwa/public/logo-wordmark.svg" alt="Dictune" width="280" />
+</p>
 
-**Find your best dictation tool** — available as a PWA and a terminal TUI.
+<p align="center"><strong>Find your best dictation tool</strong></p>
 
-Generate texts, read them aloud using different dictation tools, and compare results to find which transcriber works best for you.
+<p align="center">
+Generate texts using AI, read them aloud using different dictation tools, and compare results to find which transcriber hears you best.
+</p>
 
-## Monorepo Structure
+![PWA Screenshot](./assets/pwa.png)
 
-| Package | Description | Stack |
-|---------|-------------|-------|
-| `@dictune/core` | Shared logic (diff engine, AI, config) | TypeScript |
-| `@dictune/pwa` | Installable web app | Vite + React + PWA |
-| `@dictune/tui` | Terminal interface | Ink 6 + Bun |
+## Web App
 
-## Quick Start
+Try it now at **https://dictune.github.io** — works offline after the first load.
+
+To install as an app on your device, open the site and:
+- **Chrome / Edge**: Click the install icon in the address bar, or Menu → "Install Dictune"
+- **Safari (iOS)**: Tap Share → "Add to Home Screen"
+
+## Terminal App
+
+Install with one command (Linux & macOS):
 
 ```bash
-bun install
-
-# Web app
-bun run dev:pwa      # → http://localhost:5173/dictune/
-
-# Terminal app
-bun run dev:tui      # → interactive terminal UI
+curl -fsSL https://raw.githubusercontent.com/CunliangGeng/dictune/main/install.sh | bash
 ```
+
+Or download a binary manually from [GitHub Releases](https://github.com/CunliangGeng/dictune/releases/latest). Available for Linux (x64, arm64), macOS (x64, arm64), and Windows (x64).
 
 ## AI Providers
 
-- **In-browser AI** (PWA only): Runs locally in your browser via WebLLM + WebGPU. Downloads a Qwen3 model (~350MB) once, then works fully offline.
+- **In-browser AI** (Web app only): Runs locally in your browser via WebLLM + WebGPU. Downloads Qwen3 models once, then works fully offline.
 - **Local or Cloud AI**: Connect to any OpenAI-compatible endpoint — self-hosted (Ollama, LM Studio, Jan, etc.) or cloud (OpenAI, Anthropic, Google Gemini, Mistral AI, DeepSeek, Together AI, Groq, etc.)
-
-Configure via Settings (⚙️ in PWA, `[s]` in TUI).
-
-## Architecture
-
-See [DESIGN.md](./DESIGN.md) for the full design document.
