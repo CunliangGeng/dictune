@@ -20,10 +20,10 @@ export default defineConfig({
       registerType: "prompt",
       includeAssets: ["favicon.svg", "logo.svg", "wordmark.svg"],
       manifest: {
-        name: "Dictune — Pronunciation Practice",
+        name: "Dictune — Find Your Best Dictation Tool",
         short_name: "Dictune",
         description:
-          "Practice pronunciation clarity with AI-generated texts and system dictation comparison",
+          "Generate texts, use different dictation tools, and compare results to find which transcriber works best for you",
         theme_color: "#2E3440",
         background_color: "#ECEFF4",
         start_url: "/dictune/",

@@ -3,7 +3,7 @@
   "version": "0.5.0",
   "private": true,
   "type": "module",
-  "description": "Dictune PWA — pronunciation practice web app",
+  "description": "Dictune PWA — find your best dictation tool",
   "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
   "license": "MIT",
   "repository": {

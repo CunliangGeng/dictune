@@ -1,7 +1,7 @@
 {
   "name": "dictune",
   "private": true,
-  "description": "Pronunciation clarity practice tool — PWA and TUI",
+  "description": "Dictation tool comparison app — find the best transcriber for your voice",
   "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
   "license": "MIT",
   "repository": {

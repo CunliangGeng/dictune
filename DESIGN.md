@@ -7,7 +7,7 @@
 
 ## 1. Overview
 
-Dictune is a pronunciation clarity practice tool available as both a **PWA** (Progressive Web App) and a **TUI** (Terminal User Interface). Both interfaces share a common core of business logic, diffing engine, and AI integration.
+Dictune is a dictation tool comparison app available as both a **PWA** (Progressive Web App) and a **TUI** (Terminal User Interface). Both interfaces share a common core of business logic, diffing engine, and AI integration.
 
 The user workflow is the same in both:
 1. Select language, difficulty level, reading duration

@@ -2,7 +2,7 @@
   "name": "@dictune/tui",
   "version": "0.5.0",
   "type": "module",
-  "description": "Dictune TUI — pronunciation practice terminal app",
+  "description": "Dictune TUI — find your best dictation tool",
   "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
   "license": "MIT",
   "repository": {

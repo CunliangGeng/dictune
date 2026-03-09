@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Dictune is a pronunciation clarity practice tool. Users read AI-generated texts aloud using OS dictation, then the app diffs the original against the dictation result to highlight pronunciation weak spots. Available as a PWA (web) and TUI (terminal).
+Dictune helps you to find the best dictation tool for your voice. Users generate AI texts, read them aloud using different dictation/transcription tools, and the app diffs the original against the transcription to reveal which tool works best for them. Available as a PWA (web) and TUI (terminal).
 
 ## Commands
 

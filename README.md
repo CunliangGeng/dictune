@@ -1,8 +1,8 @@
 # Dictune
 
-**Pronunciation clarity practice tool** — available as a PWA and a terminal TUI.
+**Find your best dictation tool** — available as a PWA and a terminal TUI.
 
-Practice by reading AI-generated texts aloud using your OS dictation, then compare to find pronunciation weak spots.
+Generate texts, read them aloud using different dictation tools, and compare results to find which transcriber works best for you.
 
 ## Monorepo Structure
 
