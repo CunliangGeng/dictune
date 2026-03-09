@@ -109,4 +109,7 @@ export interface UIStrings {
   levelEasy: string;
   levelMedium: string;
   levelHard: string;
+  updateAvailable: string;
+  offlineReady: string;
+  reload: string;
 }

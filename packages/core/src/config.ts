@@ -32,9 +32,9 @@ DIFFICULTY: ${diff}
 
 STYLE: Natural SPOKEN style — like someone telling a story or leaving a voice message. Do NOT use contractions (I'm, don't, we've). Write in complete, full sentences — not fragments or isolated words.
 
-LANGUAGE: Every single word must be in English. Do NOT mix in any other language. No foreign words, no translations.
+LANGUAGE: The entire output must be in English and ONLY English. Every single word, including names, places, and topic-specific terms, must be in English. Do NOT mix in any other language. No foreign words, no translations, no transliterations. If the topic is about another culture, describe it using only English words.
 
-Output ONLY the paragraph. Nothing else.`;
+Output ONLY the paragraph. Nothing else. Do NOT include any preamble, introduction, or meta-commentary such as "Here is..." or "Sure,...". Start directly with the first sentence of the paragraph.`;
     },
   },
   nl: {
@@ -58,9 +58,9 @@ MOEILIJKHEID: ${diff}
 
 STIJL: Natuurlijke SPREEKSTIJL — alsof je een verhaal vertelt of een voicemail inspreekt. Schrijf in volledige, hele zinnen — geen losse woorden of fragmenten.
 
-TAAL: Elk woord moet in het Nederlands zijn. Gebruik GEEN Engelse of andere buitenlandse woorden. Geen vertalingen, geen codeswitching.
+TAAL: De volledige tekst moet in het Nederlands zijn en ALLEEN in het Nederlands. Elk woord, inclusief namen, plaatsen en onderwerpspecifieke termen, moet in het Nederlands zijn. Gebruik GEEN Engelse of andere buitenlandse woorden. Geen vertalingen, geen transliteraties, geen codeswitching. Als het onderwerp over een andere cultuur gaat, beschrijf het dan alleen met Nederlandse woorden.
 
-Geef ALLEEN de alinea. Niets anders.`;
+Geef ALLEEN de alinea. Niets anders. Geen inleiding, geen meta-commentaar zoals "Hier is..." of "Natuurlijk,...". Begin direct met de eerste zin van de alinea.`;
     },
   },
   zh: {
@@ -84,9 +84,9 @@ Geef ALLEEN de alinea. Niets anders.`;
 
 风格：自然口语风格——像在讲一个故事或发语音消息。要用完整的句子，不要只写几个零散的词语或片段。
 
-语言：每个字都必须是中文。绝对不要混入英文或其他语言。不要夹杂外语单词、翻译或注释。
+语言：整段文字必须全部使用中文，只能使用中文。每个字、每个词，包括人名、地名和主题相关术语，都必须是中文。绝对不要混入英文、拼音或其他任何语言。不要夹杂外语单词、翻译、音译或注释。如果主题涉及其他文化，请只用中文词汇描述。
 
-只输出这段话。不要其他任何内容。`;
+只输出这段话。不要其他任何内容。不要加任何开头语或元评论，例如"这是..."或"好的,..."。直接从段落的第一句话开始。`;
     },
   },
 };
@@ -263,6 +263,9 @@ export const UI_STRINGS: Record<LangCode, UIStrings> = {
     levelEasy: "Beginner",
     levelMedium: "Intermediate",
     levelHard: "Advanced",
+    updateAvailable: "New version available — tap to update",
+    offlineReady: "App ready for offline use",
+    reload: "Reload",
   },
   nl: {
     generate: "Genereer",
@@ -288,6 +291,9 @@ export const UI_STRINGS: Record<LangCode, UIStrings> = {
     levelEasy: "Beginner",
     levelMedium: "Gemiddeld",
     levelHard: "Gevorderd",
+    updateAvailable: "Nieuwe versie beschikbaar — tik om bij te werken",
+    offlineReady: "App klaar voor offline gebruik",
+    reload: "Herladen",
   },
   zh: {
     generate: "生成",
@@ -313,5 +319,8 @@ export const UI_STRINGS: Record<LangCode, UIStrings> = {
     levelEasy: "初级",
     levelMedium: "中级",
     levelHard: "高级",
+    updateAvailable: "新版本可用 — 点击更新",
+    offlineReady: "应用已可离线使用",
+    reload: "刷新",
   },
 };

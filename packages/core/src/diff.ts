@@ -5,12 +5,8 @@ import type { ComparisonResult, DiffPart, LangCode } from "./types";
 
 export function preprocess(text: string, lang: LangCode): string {
   let r = text.normalize("NFC").trim().replace(/\s+/g, " ");
-  // Only strip punctuation for Chinese (char-level diff); keep for English/Dutch
   if (LANGUAGES[lang].diffMode === "char") {
-    r = r
-      .replace(/[\p{P}]/gu, "")
-      .replace(/\s+/g, " ")
-      .trim();
+    // Normalize fullwidth ASCII to halfwidth, ideographic space to regular space
     r = r.replace(/[\uff01-\uff5e]/g, (ch) =>
       String.fromCharCode(ch.charCodeAt(0) - 0xfee0),
     );
@@ -190,11 +186,9 @@ export function compareTexts(
 ): ComparisonResult {
   const oT = tokenize(preprocess(original, lang), lang);
   const tT = tokenize(preprocess(transcription, lang), lang);
-  let diff: DiffPart[] = refineDiff(lcsArrays(oT, tT));
+  const diff: DiffPart[] = refineDiff(lcsArrays(oT, tT));
 
-  const isChar = LANGUAGES[lang].diffMode === "char";
-  const sep = isChar ? "" : " ";
-  if (isChar) diff = insertPuncSpaces(diff, getPuncSpacePositions(original));
+  const sep = LANGUAGES[lang].diffMode === "char" ? "" : " ";
 
   let matched = 0,
     wrong = 0,
