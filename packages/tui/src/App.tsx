@@ -432,16 +432,17 @@ export function App() {
           paddingX={2}
           paddingY={1}
           flexDirection="column"
+          flexShrink={0}
         >
           <Text bold color={C.accent}>
             {t.original.toUpperCase()}
           </Text>
-          <Text>
+          <Text wrap="wrap">
             {"\n"}
             {originalText}
           </Text>
         </Box>
-        <Box marginTop={1} flexDirection="column">
+        <Box marginTop={1} flexDirection="column" flexShrink={0}>
           <Text bold>{t.dictation}</Text>
           <Text dimColor>{t.placeholder}</Text>
           <Box marginTop={1}>
@@ -470,30 +471,38 @@ export function App() {
           : C.missing;
     return (
       <Box flexDirection="column" padding={1}>
-        {/* Diff panels (stacked) */}
-        <Box
-          borderStyle="round"
-          borderColor={C.accent}
-          paddingX={2}
-          paddingY={1}
-          flexDirection="column"
-        >
-          <Text bold color={C.accent}>
-            {t.original.toUpperCase()}
-          </Text>
-          <DiffLine diff={result.diff} sep={result.sep} side="original" />
-        </Box>
-        <Box
-          borderStyle="round"
-          borderColor={C.frost}
-          paddingX={2}
-          paddingY={1}
-          flexDirection="column"
-        >
-          <Text bold color={C.frost}>
-            {t.dictation.toUpperCase()}
-          </Text>
-          <DiffLine diff={result.diff} sep={result.sep} side="transcription" />
+        {/* Diff panels (side-by-side) */}
+        <Box flexDirection="row" gap={1}>
+          <Box
+            borderStyle="round"
+            borderColor={C.accent}
+            paddingX={1}
+            paddingY={1}
+            flexDirection="column"
+            width="50%"
+          >
+            <Text bold color={C.accent}>
+              {t.original.toUpperCase()}
+            </Text>
+            <DiffLine diff={result.diff} sep={result.sep} side="original" />
+          </Box>
+          <Box
+            borderStyle="round"
+            borderColor={C.frost}
+            paddingX={1}
+            paddingY={1}
+            flexDirection="column"
+            width="50%"
+          >
+            <Text bold color={C.frost}>
+              {t.dictation.toUpperCase()}
+            </Text>
+            <DiffLine
+              diff={result.diff}
+              sep={result.sep}
+              side="transcription"
+            />
+          </Box>
         </Box>
 
         {/* Legend */}
