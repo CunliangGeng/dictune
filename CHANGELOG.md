@@ -1,5 +1,82 @@
 # Changelog
 
+## Rebranding & TUI Overhaul (2026-03-09)
+
+### App Rebranding
+
+Dictune is now positioned as a **dictation tool comparison app** — helping users find which dictation/transcription tool works best for their voice, rather than a pronunciation practice tool.
+
+- New tagline: **"Find your best dictation tool"** (localized: nl "Vind je beste dicteertool", zh "找到最懂你的听写工具")
+- Updated descriptions across all `package.json` files, PWA manifest, HTML meta, README, CLAUDE.md, and DESIGN.md
+- Dictation hint text updated to "Use your dictation tool to transcribe the text..." (all languages)
+- Welcome and generating messages now say "test text" instead of "practice text"
+
+### TUI UX Improvements
+
+- **Auto-connect on generate** — TUI now auto-connects to the AI server and picks the first model if not already connected (matching PWA behavior)
+- **Generation status** — shows "Using {model} on {service}" during text generation
+- **Grouped AI presets** — settings list separates self-hosted and cloud providers with section headers
+- **Smart API key label** — shows "(required)" for cloud providers, "(optional)" for self-hosted
+- **Global `[s]` settings shortcut** — accessible from any non-input screen
+- **Back navigation** — `[b]` on selection screens, `[Esc]` on text-input screens (topic, dictation)
+- **Keyboard shortcuts** — number keys `[1-N]` for selection screens, letter keys `[r][n][b][q]` on results
+
+### TUI Localization
+
+- All hint text now uses localized `UI_STRINGS` instead of hardcoded English
+- Added 10 new UI string keys: `tagline`, `selectLanguage`, `selectDifficulty`, `selectDuration`, `settings`, `back`, `quit`, `enterToSkip`, `enterToCompare`, `generatingText`
+- Translations added for all three languages (en, nl, zh)
+
+### TUI Visual Design
+
+- **ANSI background colors** for diff highlights — red (wrong), yellow (missing), green (extra), dots (gap)
+- **Side-by-side diff panels** with colored borders — purple for original, frost blue for dictation
+- **Compact stats row** in dashed silver border with accuracy as first stat
+- **Compact legend** with color swatches
+
+### Diff Engine Fix
+
+- **Chinese punctuation preserved** — punctuation is no longer stripped during comparison, so characters like `。`, `，`, `！` appear in diff results
+
+### Prompt Improvements
+
+- **Anti-preamble** — prompts now explicitly forbid filler like "Here is..." or "Sure,..." in all three languages
+- **Stronger language enforcement** — prompts forbid mixing languages, transliterations, and foreign words even for topic-specific terms
+
+### PWA Updates
+
+- **Update toast** — PWA now shows a prompt when a new version is available (changed from `autoUpdate` to `prompt` registration)
+- **GitHub Actions** — switched PWA build from Node.js to Bun
+
+### TUI Build & Distribution
+
+- **Standalone executable** — `bun run build:exe` compiles TUI to a single binary
+- **Install script** — `install.sh` for downloading and installing the TUI binary
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `packages/core/src/config.ts` | Rebranded UI strings, anti-preamble prompts, stronger language rules, new i18n keys |
+| `packages/core/src/types.ts` | Added new `UIStrings` fields |
+| `packages/core/src/diff.ts` | Removed Chinese punctuation stripping |
+| `packages/tui/src/App.tsx` | Full UX overhaul — auto-connect, back nav, ANSI colors, side-by-side diff, localized text |
+| `packages/pwa/src/App.jsx` | Update toast component |
+| `packages/pwa/vite.config.js` | Manifest rebranding, prompt registration |
+| `packages/pwa/index.html` | Updated meta description |
+| `package.json` | Rebranded description |
+| `packages/pwa/package.json` | Rebranded description |
+| `packages/tui/package.json` | Rebranded description, build:exe script |
+| `packages/tui/build.ts` | Standalone executable build script |
+| `install.sh` | TUI installer script |
+| `CLAUDE.md` | Rebranded project overview |
+| `README.md` | Rebranded description |
+| `DESIGN.md` | Rebranded overview |
+| `.github/workflows/deploy.yml` | Switched to Bun |
+| `.github/workflows/release-tui.yml` | New release workflow for TUI binary |
+
+---
+
 ## UI Polish & Prompt Improvements (2026-03-08)
 
 ### Prompt Coherence
