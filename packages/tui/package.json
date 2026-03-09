@@ -16,6 +16,7 @@
   "scripts": {
     "dev": "bun run src/cli.tsx",
     "build": "bun build src/cli.tsx --outdir dist --target bun",
+    "build:exe": "bun build --compile src/cli.tsx --outfile dist/dictune --external react-devtools-core --minify --sourcemap",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

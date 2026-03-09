@@ -18,6 +18,7 @@
     "dev:tui": "bun run --cwd packages/tui src/cli.tsx",
     "build:pwa": "bun run --filter @dictune/pwa build",
     "build:tui": "bun run --filter @dictune/tui build",
+    "build:exe": "bun run --filter @dictune/tui build:exe",
     "typecheck": "bun run --filter '*' typecheck",
     "lint": "bunx biome check packages/",
     "lint:fix": "bunx biome check --write packages/",
