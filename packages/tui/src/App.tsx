@@ -34,17 +34,29 @@ type Screen =
   | "results"
   | "settings";
 
-// ─── Nord colors for terminal ────────────────────────────────
+// ─── Colors ─────────────────────────────────────────────────
 
 const C = {
   accent: "#B48EAD",
   correct: "#A3BE8C",
-  wrong: "#EBCB8B",
-  missing: "#BF616A",
-  extra: "#81A1C1",
+  wrong: "red", // ANSI red bg — substituted
+  missing: "yellow", // ANSI yellow bg — removed/missing
+  extra: "green", // ANSI green bg — added/extra
   dim: "#4C566A",
   frost: "#88C0D0",
   muted: "#7B88A1",
+  silver: "#C0C0C0",
+};
+
+const DASHED_BOX = {
+  topLeft: "┌",
+  top: "╌",
+  topRight: "┐",
+  right: "╎",
+  bottomRight: "┘",
+  bottom: "╌",
+  bottomLeft: "└",
+  left: "╎",
 };
 
 // ─── Diff renderer for terminal ──────────────────────────────
@@ -75,34 +87,49 @@ function DiffLine({
               ? part.original.join(sep)
               : part.transcribed.join(sep);
           return (
-            <Text key={i} color="black" backgroundColor={C.wrong}>
-              {t}
+            <Text key={i}>
+              <Text backgroundColor={C.wrong} color="white" bold>
+                {t}
+              </Text>
+              {sep}
             </Text>
           );
         }
         if (part.type === "removed") {
           if (side === "original")
             return (
-              <Text key={i} color="white" backgroundColor={C.missing}>
-                {part.value.join(sep)}
+              <Text key={i}>
+                <Text backgroundColor={C.missing} color="black">
+                  {part.value.join(sep)}
+                </Text>
+                {sep}
               </Text>
             );
+          const dots = "·".repeat(
+            part.value.join(sep).length + (sep === " " ? 1 : 0),
+          );
           return (
-            <Text key={i} color={C.muted} dimColor strikethrough>
-              {"_".repeat(part.value.join(sep).length)}
+            <Text key={i} dimColor>
+              {dots}
             </Text>
           );
         }
         if (part.type === "added") {
           if (side === "transcription")
             return (
-              <Text key={i} color="white" backgroundColor={C.extra}>
-                {part.value.join(sep)}
+              <Text key={i}>
+                <Text backgroundColor={C.extra} color="black">
+                  {part.value.join(sep)}
+                </Text>
+                {sep}
               </Text>
             );
+          const dots = "·".repeat(
+            part.value.join(sep).length + (sep === " " ? 1 : 0),
+          );
           return (
-            <Text key={i} color={C.muted} dimColor strikethrough>
-              {"_".repeat(part.value.join(sep).length)}
+            <Text key={i} dimColor>
+              {dots}
             </Text>
           );
         }
@@ -118,42 +145,21 @@ function StatBox({
   label,
   value,
   color,
+  suffix,
 }: {
   label: string;
   value: number;
   color?: string;
+  suffix?: string;
 }) {
   return (
     <Box flexDirection="column" alignItems="center" paddingX={2}>
       <Text bold color={color}>
         {value}
+        {suffix || ""}
       </Text>
       <Text dimColor>{label}</Text>
     </Box>
-  );
-}
-
-// ─── Progress bar ────────────────────────────────────────────
-
-function ProgressBar({
-  percent,
-  width = 30,
-  color,
-}: {
-  percent: number;
-  width?: number;
-  color: string;
-}) {
-  const filled = Math.round((percent / 100) * width);
-  return (
-    <Text>
-      <Text color={color}>{"█".repeat(filled)}</Text>
-      <Text color={C.dim}>{"░".repeat(width - filled)}</Text>
-      <Text bold color={color}>
-        {" "}
-        {percent}%
-      </Text>
-    </Text>
   );
 }
 
@@ -464,71 +470,63 @@ export function App() {
           : C.missing;
     return (
       <Box flexDirection="column" padding={1}>
-        {/* Diff panels */}
-        <Box flexDirection="row" gap={1}>
-          <Box
-            borderStyle="round"
-            borderColor={C.dim}
-            paddingX={2}
-            paddingY={1}
-            flexDirection="column"
-            flexGrow={1}
-            width="50%"
-          >
-            <Text bold dimColor>
-              {t.original.toUpperCase()}
-            </Text>
-            <DiffLine diff={result.diff} sep={result.sep} side="original" />
-          </Box>
-          <Box
-            borderStyle="round"
-            borderColor={C.dim}
-            paddingX={2}
-            paddingY={1}
-            flexDirection="column"
-            flexGrow={1}
-            width="50%"
-          >
-            <Text bold dimColor>
-              {t.dictation.toUpperCase()}
-            </Text>
-            <DiffLine
-              diff={result.diff}
-              sep={result.sep}
-              side="transcription"
-            />
-          </Box>
+        {/* Diff panels (stacked) */}
+        <Box
+          borderStyle="round"
+          borderColor={C.accent}
+          paddingX={2}
+          paddingY={1}
+          flexDirection="column"
+        >
+          <Text bold color={C.accent}>
+            {t.original.toUpperCase()}
+          </Text>
+          <DiffLine diff={result.diff} sep={result.sep} side="original" />
+        </Box>
+        <Box
+          borderStyle="round"
+          borderColor={C.frost}
+          paddingX={2}
+          paddingY={1}
+          flexDirection="column"
+        >
+          <Text bold color={C.frost}>
+            {t.dictation.toUpperCase()}
+          </Text>
+          <DiffLine diff={result.diff} sep={result.sep} side="transcription" />
         </Box>
 
         {/* Legend */}
         <Box marginTop={1} gap={2}>
-          <Text backgroundColor={C.wrong} color="black">
+          <Text backgroundColor={C.wrong} color="white">
             {" "}
-            abc{" "}
           </Text>
-          <Text dimColor> {t.legendWrong}</Text>
-          <Text backgroundColor={C.missing} color="white">
+          <Text dimColor>{t.legendWrong}</Text>
+          <Text backgroundColor={C.missing} color="black">
             {" "}
-            abc{" "}
           </Text>
-          <Text dimColor> {t.legendMissing}</Text>
+          <Text dimColor>{t.legendMissing}</Text>
           <Text backgroundColor={C.extra} color="black">
             {" "}
-            abc{" "}
           </Text>
-          <Text dimColor> {t.legendExtra}</Text>
+          <Text dimColor>{t.legendExtra}</Text>
+          <Text dimColor>· {t.legendGap}</Text>
         </Box>
 
-        {/* Score */}
-        <Box marginTop={1} flexDirection="column">
-          <Box gap={1}>
-            <Text bold color={scoreColor}>
-              {result.accuracy}%
-            </Text>
-            <Text dimColor>{t.accuracy}</Text>
-          </Box>
-          <ProgressBar percent={result.accuracy} color={scoreColor} />
-          <Box marginTop={1} gap={1}>
+        {/* Stats */}
+        <Box marginTop={1} alignSelf="flex-start">
+          <Box
+            borderStyle={DASHED_BOX}
+            borderColor={C.silver}
+            paddingX={1}
+            gap={1}
+          >
+            <StatBox
+              label={t.accuracy}
+              value={result.accuracy}
+              color={scoreColor}
+              suffix="%"
+            />
             <StatBox label={t.total} value={result.total} />
             <StatBox
               label={t.matched}
