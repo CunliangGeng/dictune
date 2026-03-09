@@ -1,7 +1,7 @@
 # Dictune — Monorepo Design Document
 
-**Version**: v6 (PWA + TUI)
-**Date**: 2026-03-08
+**Version**: v7 (PWA + TUI)
+**Date**: 2026-03-09
 
 ---
 
@@ -11,10 +11,10 @@ Dictune is a dictation tool comparison app available as both a **PWA** (Progress
 
 The user workflow is the same in both:
 1. Select language, difficulty level, reading duration
-2. AI generates a spoken-style practice text
-3. User reads aloud into their OS dictation system
-4. App compares original vs dictation, highlighting differences
-5. User reviews accuracy, tries again or generates a new text
+2. AI generates a test text
+3. User reads it aloud using their dictation/transcription tool of choice
+4. App compares original vs transcription, highlighting differences
+5. User reviews accuracy — repeat with different dictation tools to find the best one
 
 ---
 
@@ -45,12 +45,15 @@ dictune/
 │   │   └── index.html          Shell
 │   │
 │   └── tui/               ← Terminal app (Ink + Bun)
+│       ├── build.ts           Standalone executable build script
 │       └── src/
 │           ├── cli.tsx         Entry point (#!/usr/bin/env bun)
 │           └── App.tsx         Full TUI (imports from @dictune/core)
 │
 ├── .github/workflows/
-│   └── deploy.yml          GitHub Pages for PWA
+│   ├── deploy.yml          GitHub Pages for PWA (Bun)
+│   └── release-tui.yml     TUI binary release
+├── install.sh              TUI installer script
 └── package.json            Bun workspace root
 ```
 
@@ -92,11 +95,7 @@ The core package contains **all business logic** with zero runtime dependencies.
 Original ─┐                                              ┌─ equal
            ├→ preprocess → tokenize → LCS → refineDiff → ├─ wrong (substitution)
 Dictation ─┘                                              ├─ removed (missing)
-                                          │               ├─ added (extra)
-                                          ↓               └─ space (Chinese only)
-                                  insertPuncSpaces()
-                                  (Chinese: space at
-                                   punctuation positions)
+                                                          └─ added (extra)
 ```
 
 **Preprocessing rules:**
@@ -104,14 +103,13 @@ Dictation ─┘                                              ├─ removed (mi
 |----------|------------|------|-------------|
 | English | **Kept** | Lower | Word (split on whitespace) |
 | Dutch | **Kept** | Lower | Word (split on whitespace) |
-| Chinese | **Stripped** | N/A | Char (each character = token) |
+| Chinese | **Kept** (fullwidth normalized) | Lower | Char (each character = token) |
+
+Chinese preprocessing normalizes fullwidth ASCII characters (e.g. `，` → `,`) and ideographic spaces to regular spaces, but punctuation is preserved as tokens in the diff.
 
 **Substitution detection (`refineDiff`):**
 Adjacent `removed` + `added` segments are paired into `wrong` entries:
 - `removed: [a,b,c]` + `added: [x,y]` → `wrong(orig:[a,b], trans:[x,y])` + `removed:[c]`
-
-**Chinese spacing (`insertPuncSpaces`):**
-Scans original text for punctuation positions, inserts `{type: "space"}` markers in the diff array at those positions. Both panels render the same markers for alignment.
 
 ### 3.3 AI Generation
 
@@ -166,7 +164,8 @@ Presets are grouped into self-hosted and cloud:
 - **Coherence requirement**: prompts require a connected paragraph (story, conversation, or narrative) with beginning, middle, and end — not random unrelated sentences
 - **Complete sentences**: prompts enforce full sentences, not fragments or isolated words
 - Random default topics (cats, cooking, travel, etc.) when no topic is provided
-- Strict single-language enforcement in every prompt
+- **Strict single-language enforcement** — prompts forbid mixing languages, transliterations, and foreign words even for topic-specific terms
+- **Anti-preamble** — prompts explicitly forbid filler like "Here is..." or "Sure,..." and require starting directly with the first sentence
 
 ---
 
@@ -198,7 +197,7 @@ Presets are grouped into self-hosted and cloud:
 | AI models (Qwen3) | Cache API (managed by WebLLM) | Until deleted |
 | AI API calls | Network only | — |
 
-**Update mechanism**: `autoUpdate` — new versions download in background, activate on next load.
+**Update mechanism**: `prompt` — new versions download in background, user is shown a toast notification to reload and apply the update.
 
 **Offline behavior:**
 | Capability | Online | Offline (browser AI cached) | Offline (no AI) |
@@ -271,64 +270,76 @@ Bun provides:
 ```
 ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
 │ Language  │ →  │  Level   │ →  │ Duration │ →  │  Topic   │
-│ (select)  │    │ (select) │    │ (select) │    │ (input)  │
+│ (select)  │ ←  │ (select) │ ←  │ (select) │ ←  │ (input)  │
+│ [1-N][s][q]   │ [1-N][b][s]   │ [1-N][b][s]   │ [Esc]    │
 └──────────┘    └──────────┘    └──────────┘    └────┬─────┘
                                                      │ Enter
                                                      ▼
 ┌──────────────────────────────┐    ┌──────────────────────────────┐
-│ ╭─ ORIGINAL ─╮╭─ DICTATION ╮│    │  Results                     │
-│ │ The text   ││ The text   ││    │  ████████████░░░░ 78%        │
-│ │ appears... ││ apears...  ││    │                              │
-│ ╰────────────╯╰────────────╯│    │  Total  Correct Wrong Miss   │
-│                              │ →  │   45     35      5    3      │
-│ Your dictation:              │    │                              │
-│ ❯ _                          │    │  ↻ Try Again                 │
-└──────────────────────────────┘    │  ▸ Generate New              │
-                                    │  ← Change settings           │
-                                    │  ✕ Quit                      │
+│ ╭─ ORIGINAL ──╮╭─ DICTATION ╮│   │  Results                     │
+│ │ The text    ││ The text   ││   │  ┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐  │
+│ │ appears...  ││ apears...  ││   │  ╎ 78%  45  35  5  3  2  ╎  │
+│ ╰─────────────╯╰────────────╯│   │  └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘  │
+│                              │ →  │                              │
+│ Your dictation:              │    │  [r] Try Again               │
+│ ❯ _                [Esc]     │    │  [n] Generate New            │
+└──────────────────────────────┘    │  [s] Settings  [b] Back      │
+                                    │  [q] Quit                     │
                                     └──────────────────────────────┘
 ```
 
+**Navigation:** Selection screens support number keys `[1-N]` for quick pick and `[b]` to go back. Text-input screens (topic, dictation) use `[Esc]` to go back. Settings `[s]` is available globally except on text-input and generating screens. The settings screen remembers and returns to the previous screen.
+
 ### 5.4 Terminal Colors
 
-Uses Nord hex colors directly (Ink supports hex in modern terminals):
+Uses ANSI colors for diff highlights and Nord hex colors for UI accents:
 
 | Element | Color | Rendering |
 |---------|-------|-----------|
-| Wrong text | `#EBCB8B` bg | Black text on yellow |
-| Missing text | `#BF616A` bg | White text on red |
-| Extra text | `#5E81AC` bg | White text on blue |
-| Missing gap | `#7B88A1` | Dim strikethrough underscores |
-| Accent | `#B48EAD` | Logo, active selection |
-| Info | `#88C0D0` | Prompts, cursor |
+| Wrong text | ANSI `red` bg | White bold text on red |
+| Missing text | ANSI `yellow` bg | Black text on yellow |
+| Extra text | ANSI `green` bg | Black text on green |
+| Gap placeholder | dim | `·` dots |
+| Accent | `#B48EAD` | Logo, original panel border |
+| Info | `#88C0D0` | Dictation panel border, cursor |
+| Stats border | `#C0C0C0` | Dashed silver box (`╌╎`) |
+| Score | `#A3BE8C` / `red` / `yellow` | Green ≥90%, red 70-89%, yellow <70% |
 
 ### 5.5 Settings
 
-Accessible via `[s]` from the language selection screen. Multi-step menu:
-1. Select service preset (Ollama, LM Studio, etc.)
+Accessible via `[s]` from any non-input screen. Returns to the previous screen on exit. Multi-step menu:
+1. Select service preset — grouped into "Self-hosted" and "Cloud" sections
 2. Edit endpoint URL
-3. Edit API key (optional)
+3. Edit API key — label shows "(required)" for cloud presets, "(optional)" for self-hosted
 4. Test connection (shows spinner → result)
 5. Select model (from discovered list)
 
-Note: TUI only supports Local or Cloud AI (no in-browser AI). The `doGenerate` function calls `buildPrompt()` + `generateWithLocal()` directly.
+**Auto-connect on generate**: If no model is selected or not connected, `doGenerate()` automatically calls `testLocalConnection()`, picks the first model, and generates — matching PWA behavior. Shows "Using {model} on {service}" during generation.
+
+Note: TUI only supports Local or Cloud AI (no in-browser AI).
 
 ### 5.6 Devcontainer Support
 
 When running inside a devcontainer (`DEVCONTAINER=true` env var), all self-hosted AI preset URLs automatically use `host.docker.internal` instead of `localhost`, so the TUI can reach AI servers running on the host machine.
 
-### 5.7 Running
+### 5.7 Localization
+
+All user-facing text uses `UI_STRINGS[lang]` from core. This includes screen headers (`selectLanguage`, `selectDifficulty`, `selectDuration`), action labels (`settings`, `back`, `quit`), input placeholders (`enterToSkip`, `enterToCompare`), the tagline, and generating status text. Settings UI remains in English (technical terms).
+
+### 5.8 Running & Distribution
 
 ```bash
 # Development (uses --cwd to preserve TTY raw mode for Ink)
 bun run dev:tui      # from repo root
 
-# Build standalone
-bun run build        # → dist/cli.js
+# Build JS bundle
+bun run build:tui    # → packages/tui/dist/
 
-# Install globally (from repo)
-bun link
-dictune              # runs from anywhere
+# Build standalone executable
+bun run build:exe    # → packages/tui/dist/dictune (single binary, no Bun required)
+
+# Install via script
+curl -fsSL https://raw.githubusercontent.com/CunliangGeng/dictune/main/install.sh | bash
 ```
 
 ---
@@ -344,7 +355,6 @@ dictune              # runs from anywhere
 | AI presets & defaults | ✅ | — | — |
 | Diff engine (preprocess, tokenize, LCS) | ✅ | — | — |
 | Diff refinement (wrong detection) | ✅ | — | — |
-| Chinese punctuation spacing | ✅ | — | — |
 | Score calculation | ✅ | — | — |
 | AI generation (OpenAI-compatible) | ✅ | — | — |
 | Connection testing | ✅ | — | — |
@@ -387,9 +397,9 @@ bun run build:tui            # → packages/tui/dist/
 
 ## 8. Future Considerations
 
-- **IndexedDB persistence**: Save practice history, settings, AI config across PWA sessions
-- **Bun SQLite**: Save practice history locally for TUI
+- **IndexedDB persistence**: Save comparison history, settings, AI config across PWA sessions
+- **Bun SQLite**: Save comparison history locally for TUI
 - **Shared React components**: If Ink's Box/Text API converges further with React DOM, some layout components could be abstracted
 - **Tauri desktop app**: Third surface sharing the same core, with native performance
-- **npm distribution**: Publish `@dictune/tui` to npm for `bunx dictune` installation
 - **Additional browser AI models**: Support more WebLLM-compatible models as they become available
+- **Side-by-side tool comparison**: Let users run multiple dictation tools on the same text and see results compared directly
