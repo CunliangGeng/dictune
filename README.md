@@ -12,7 +12,7 @@ Generate texts using AI, read them aloud using different dictation tools, and co
 
 ## Web App
 
-Try it now at **https://dictune.github.io** — works offline after the first load.
+Try it now at the [github page](https://cunlianggeng.github.io/dictune/) — works offline after the first load.
 
 To install as an app on your device, open the site and:
 - **Chrome / Edge**: Click the install icon in the address bar, or Menu → "Install Dictune"
