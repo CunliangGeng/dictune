@@ -959,11 +959,24 @@ function SettingsSidebar({
                   borderRadius: "8px",
                 }}
               >
-                <strong style={{ color: "var(--text-secondary)" }}>
-                  Connection trouble?
+                <strong style={{ color: "var(--aurora-yellow, #e8580f)" }}>
+                  "Failed to fetch" error?
                 </strong>
                 <br />
-                Ollama: set{" "}
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>
+                  1. Use Chrome or Firefox
+                </strong>
+                <br />
+                Safari blocks requests from HTTPS pages to local HTTP servers
+                (mixed content).
+                <br />
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>
+                  2. Allow CORS origin on your server
+                </strong>
+                <br />
+                Set the origin to{" "}
                 <code
                   style={{
                     fontSize: "10px",
@@ -972,12 +985,80 @@ function SettingsSidebar({
                     borderRadius: "3px",
                   }}
                 >
-                  OLLAMA_ORIGINS=*
+                  https://cunlianggeng.github.io
                 </code>
                 <br />
-                LM Studio: enable CORS in settings
                 <br />
-                Jan: CORS enabled by default
+                <strong style={{ color: "var(--text-secondary)" }}>
+                  Ollama
+                </strong>
+                :{" "}
+                <code
+                  style={{
+                    fontSize: "10px",
+                    background: "var(--border)",
+                    padding: "1px 4px",
+                    borderRadius: "3px",
+                  }}
+                >
+                  OLLAMA_ORIGINS=https://cunlianggeng.github.io ollama serve
+                </code>
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>
+                  LM Studio
+                </strong>
+                : enable CORS in Developer settings, set allowed origin
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>Jan</strong>:
+                CORS enabled by default
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>
+                  GPT4All
+                </strong>
+                : enable API server in settings
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>
+                  LocalAI
+                </strong>
+                :{" "}
+                <code
+                  style={{
+                    fontSize: "10px",
+                    background: "var(--border)",
+                    padding: "1px 4px",
+                    borderRadius: "3px",
+                  }}
+                >
+                  --cors-allow-origins https://cunlianggeng.github.io
+                </code>
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>
+                  llama.cpp
+                </strong>
+                :{" "}
+                <code
+                  style={{
+                    fontSize: "10px",
+                    background: "var(--border)",
+                    padding: "1px 4px",
+                    borderRadius: "3px",
+                  }}
+                >
+                  --cors-allow-origin https://cunlianggeng.github.io
+                </code>
+                <br />
+                <strong style={{ color: "var(--text-secondary)" }}>vLLM</strong>
+                :{" "}
+                <code
+                  style={{
+                    fontSize: "10px",
+                    background: "var(--border)",
+                    padding: "1px 4px",
+                    borderRadius: "3px",
+                  }}
+                >
+                  --allowed-origins https://cunlianggeng.github.io
+                </code>
               </div>
             </>
           )}
