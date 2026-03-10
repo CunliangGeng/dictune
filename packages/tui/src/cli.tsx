@@ -18,13 +18,31 @@ Options:
   process.exit(0);
 }
 
+const pkg = await import("../package.json");
+
 if (cmd === "--version" || cmd === "-v") {
-  const pkg = await import("../package.json");
   console.log(pkg.version);
   process.exit(0);
 }
 
 if (cmd === "update") {
+  const res = await fetch(
+    "https://github.com/CunliangGeng/dictune/releases/latest",
+    { redirect: "manual" },
+  );
+  const location = res.headers.get("location") || "";
+  const latestTag = location.split("/").pop() || "";
+  const latestVersion = latestTag.replace(/^v/, "");
+
+  if (latestVersion && pkg.version === latestVersion) {
+    console.log(`Already up to date (v${pkg.version})`);
+    process.exit(0);
+  }
+
+  if (latestVersion) {
+    console.log(`Updating v${pkg.version} → v${latestVersion}...`);
+  }
+
   const url =
     "https://raw.githubusercontent.com/CunliangGeng/dictune/main/install.sh";
   const proc = Bun.spawn(["bash", "-c", `curl -fsSL ${url} | bash`], {
