@@ -28,7 +28,7 @@ Or download a binary manually from [GitHub Releases](https://github.com/Cunliang
 
 ## AI Providers
 
-- **In-browser AI** (Web app only): Runs locally in your browser via WebLLM + WebGPU. Downloads specified Qwen3 model once, then works fully offline.
+- **In-browser AI** (Web app only): Runs locally in your browser via WebLLM + WebGPU. Downloads specified Qwen3 model once, then works fully offline. **Desktop only** — mobile and tablet devices are not supported due to WebGPU limitations on mobile browsers.
 - **Local or Cloud AI**: Connect to any OpenAI-compatible endpoint — self-hosted (Ollama, LM Studio, Jan, etc.) or cloud (OpenAI, Anthropic, Google Gemini, Mistral AI, DeepSeek, Together AI, Groq, etc.)
 
 

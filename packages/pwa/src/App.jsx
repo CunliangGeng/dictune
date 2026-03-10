@@ -800,6 +800,14 @@ function SettingsSidebar({
               >
                 Runs entirely in your browser using WebGPU. The model is
                 downloaded once and cached for offline use.
+                <br />
+                <br />
+                <strong style={{ color: "var(--nord12)" }}>
+                  Desktop only.
+                </strong>{" "}
+                Mobile and tablet devices are not supported due to WebGPU
+                limitations. Use a desktop browser (Chrome or Firefox
+                recommended) or switch to a local/cloud AI provider.
               </div>
             </>
           )}
