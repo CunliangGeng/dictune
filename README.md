@@ -48,3 +48,6 @@ Or download a binary manually from [GitHub Releases](https://github.com/Cunliang
 | **LocalAI** | Launch with `--cors-allow-origins https://cunlianggeng.github.io` |
 | **llama.cpp** | Launch with `--cors-allow-origin https://cunlianggeng.github.io` |
 | **vLLM** | Launch with `--allowed-origins https://cunlianggeng.github.io` |
+
+## License
+MIT
