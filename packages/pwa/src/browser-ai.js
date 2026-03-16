@@ -4,10 +4,29 @@ let currentModelId = null;
 export const BROWSER_AI_MODELS = [
   {
     id: "Qwen3-0.6B-q4f16_1-MLC",
-    label: "Qwen3 0.6B (~350MB)",
-    size: "~350MB",
+    label: "Qwen3 0.6B — Basic, any device",
+    size: "~1.4GB",
   },
-  { id: "Qwen3-1.7B-q4f16_1-MLC", label: "Qwen3 1.7B (~1GB)", size: "~1GB" },
+  {
+    id: "Qwen3-1.7B-q4f16_1-MLC",
+    label: "Qwen3 1.7B — Good, most devices (recommended)",
+    size: "~2GB",
+  },
+  {
+    id: "Qwen2.5-3B-Instruct-q4f16_1-MLC",
+    label: "Qwen2.5 3B — Great, 4GB+ GPU",
+    size: "~2.5GB",
+  },
+  {
+    id: "Qwen3-4B-q4f16_1-MLC",
+    label: "Qwen3 4B — High, 6GB+ GPU",
+    size: "~3.4GB",
+  },
+  {
+    id: "Qwen3-8B-q4f16_1-MLC",
+    label: "Qwen3 8B — Best, 8GB+ GPU",
+    size: "~5.7GB",
+  },
 ];
 
 export const DEFAULT_BROWSER_MODEL = BROWSER_AI_MODELS[0].id;
