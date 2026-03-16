@@ -1,6 +1,11 @@
 import { DEFAULT_TOPICS, LANGUAGES } from "./config";
 import type { ApiServerConfig, DifficultyLevel, LangCode } from "./types";
 
+// ─── Shared system prompt ────────────────────────────────────
+
+export const SYSTEM_PROMPT =
+  "You are a text generator. Output ONLY the requested text. No preamble, no explanation.";
+
 // ─── API Server (OpenAI-compatible) ─────────────────────────
 
 function assertSecureForApiKey(baseURL: string, apiKey: string): void {
@@ -39,7 +44,10 @@ export async function generateWithLocal(
     headers,
     body: JSON.stringify({
       model: config.model,
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: prompt },
+      ],
       max_tokens: 1000,
       temperature: 0.7,
       stream: false,
