@@ -62,34 +62,43 @@ const DASHED_BOX = {
 // ─── Animated title ─────────────────────────────────────────
 
 const TITLE_ART = [
-  "  ██████╗ ██╗ ██████╗████████╗██╗   ██╗███╗   ██╗███████╗",
-  "  ██╔══██╗██║██╔════╝╚══██╔══╝██║   ██║████╗  ██║██╔════╝",
-  "  ██║  ██║██║██║        ██║   ██║   ██║██╔██╗ ██║█████╗  ",
-  "  ██║  ██║██║██║        ██║   ██║   ██║██║╚██╗██║██╔══╝  ",
-  "  ██████╔╝██║╚██████╗   ██║   ╚██████╔╝██║ ╚████║███████╗",
-  "  ╚═════╝ ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═══╝╚══════╝",
+  "        ____   _        __                            ",
+  "       / __ \\ (_)_____ / /_ __  __ ____   ___        ",
+  "      / / / // // ___// __// / / // __ \\ / _ \\       ",
+  "     / /_/ // // /__ / /_ / /_/ // / / //  __/       ",
+  "    /_____//_/ \\___/ \\__/ \\__,_//_/ /_/ \\___/        ",
 ];
 
-const GRADIENT = ["#D4A6D8", "#C4E8A0", "#A8E4F0", "#7DA8E8", "#F07888", "#F0A880", "#FFE8A0"];
+const RAINBOW = [
+  "red", "redBright", "yellowBright", "greenBright",
+  "cyanBright", "blueBright", "magentaBright",
+];
+
+const CHUNK_SIZE = 4;
 
 function AnimatedTitle({ tagline, animated = true }: { tagline: string; animated?: boolean }) {
   const [offset, setOffset] = useState(0);
 
   useEffect(() => {
     if (!animated) return;
-    const id = setInterval(() => setOffset((o) => (o + 1) % GRADIENT.length), 400);
+    const id = setInterval(() => setOffset((o) => (o + 1) % RAINBOW.length), 200);
     return () => clearInterval(id);
   }, [animated]);
 
   return (
     <Box flexDirection="column" marginBottom={1}>
       {TITLE_ART.map((line, i) => (
-        <Text key={i} bold color={GRADIENT[(i + offset) % GRADIENT.length]}>
-          {line}
-        </Text>
+        <Box key={i}>
+          {Array.from({ length: Math.ceil(line.length / CHUNK_SIZE) }, (_, c) => (
+            <Text key={c} bold color={RAINBOW[(c + i + offset) % RAINBOW.length]}>
+              {line.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE)}
+            </Text>
+          ))}
+        </Box>
       ))}
-      <Box width={TITLE_ART[0].length} justifyContent="center">
-        <Text bold italic color={GRADIENT[(offset + 1) % GRADIENT.length]}>{tagline}</Text>
+      <Text> </Text>
+      <Box width={TITLE_ART[0].length - 2} justifyContent="center">
+        <Text italic color="gray">{tagline}</Text>
       </Box>
     </Box>
   );
@@ -280,7 +289,7 @@ export function App() {
 
   // ── Key handler for global shortcuts ──
   useInput((input, key) => {
-    if (input === "q" && (screen === "lang" || screen === "results")) exit();
+    if (input === "q" && screen !== "topic" && screen !== "practice") exit();
     if (
       input === "s" &&
       screen !== "settings" &&
@@ -390,7 +399,7 @@ export function App() {
         />
         <Box marginTop={1}>
           <Text dimColor>
-            [Esc] {t.back} [s] {t.settings}
+            [Esc] {t.back} [s] {t.settings} [q] {t.quit}
           </Text>
         </Box>
       </Box>
@@ -419,7 +428,7 @@ export function App() {
         />
         <Box marginTop={1}>
           <Text dimColor>
-            [Esc] {t.back} [s] {t.settings}
+            [Esc] {t.back} [s] {t.settings} [q] {t.quit}
           </Text>
         </Box>
       </Box>
@@ -471,6 +480,9 @@ export function App() {
             <Text dimColor> {genStatus}</Text>
           </Box>
         )}
+        <Box marginTop={1}>
+          <Text dimColor>[q] {t.quit}</Text>
+        </Box>
       </Box>
     );
   }

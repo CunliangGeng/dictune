@@ -1,6 +1,6 @@
 {
   "name": "@dictune/tui",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "type": "module",
   "description": "Dictune TUI — find your best dictation tool",
   "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
