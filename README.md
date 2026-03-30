@@ -8,15 +8,19 @@
 Generate texts using AI, read them aloud using different dictation tools, and compare results to find which transcriber hears you best.
 </p>
 
-![PWA Screenshot](./assets/pwa.png)
 
 ## Web App
+
+![PWA Screenshot](./assets/pwa.png)
+
 
 Try it now at the [github page](https://cunlianggeng.github.io/dictune/) — works offline after the first load.
 
  **Chrome** or **Firefox** are recommended for best AI compatibility. Safari users can still use the in-browser AI, but self-hosted AI servers won't directly work due to Safari's restrictions.
 
 ## Terminal App
+
+![TUI Screenshot](./assets/tui.png)
 
 Install with one command (Linux & macOS):
 
@@ -25,6 +29,24 @@ curl -fsSL https://raw.githubusercontent.com/CunliangGeng/dictune/main/install.s
 ```
 
 Or download a binary manually from [GitHub Releases](https://github.com/CunliangGeng/dictune/releases/latest): available for Linux (x64, arm64), macOS (x64, arm64), and Windows (x64).
+
+To start the terminal app, run the command:
+
+```bash
+dictune
+```
+
+To update to the latest version, run the command:
+
+```bash
+dictune update
+```
+
+To uninstall, run the command:
+
+```bash
+dictune uninstall
+```
 
 ## AI Providers
 
