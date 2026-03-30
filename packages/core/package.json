@@ -1,6 +1,6 @@
 {
   "name": "@dictune/core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "description": "Shared logic for Dictune — diff engine, AI generation, config",
   "author": "Cunliang Geng <c.geng@esciencecenter.nl>",
