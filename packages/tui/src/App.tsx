@@ -258,7 +258,7 @@ export function App() {
           setAiConfig(config);
         } catch {
           throw new Error(
-            `Cannot connect to ${AI_PRESETS[config.preset]?.name || config.baseURL}. Check settings [s] and try again.`,
+            `Cannot connect to ${AI_PRESETS[config.preset]?.name || config.baseURL}. Check your settings and try again.`,
           );
         }
       }
@@ -307,6 +307,10 @@ export function App() {
     if (key.escape && screen === "practice") {
       setTranscription("");
       setScreen("topic");
+    }
+    if (key.escape && screen === "settings") {
+      if (settingsStep === "menu") setScreen(prevScreen);
+      else setSettingsStep("menu");
     }
 
     // Number shortcuts for selection screens
@@ -702,10 +706,12 @@ export function App() {
                       },
                     ]
                   : []),
-                { label: "← Back", value: "back" },
+                { label: "[Esc] Back", value: "back" },
+                { label: `[q] ${t.quit}`, value: "quit" },
               ]}
               onSelect={(item) => {
                 if (item.value === "back") setScreen(prevScreen);
+                else if (item.value === "quit") exit();
                 else if (item.value === "test") {
                   setSettingsStep("test");
                   setTestMsg("Testing...");
