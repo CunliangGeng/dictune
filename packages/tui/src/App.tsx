@@ -20,7 +20,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import SelectInput from "ink-select-input";
 import Spinner from "ink-spinner";
 import TextInput from "ink-text-input";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -58,6 +58,42 @@ const DASHED_BOX = {
   bottomLeft: "└",
   left: "╎",
 };
+
+// ─── Animated title ─────────────────────────────────────────
+
+const TITLE_ART = [
+  "  ██████╗ ██╗ ██████╗████████╗██╗   ██╗███╗   ██╗███████╗",
+  "  ██╔══██╗██║██╔════╝╚══██╔══╝██║   ██║████╗  ██║██╔════╝",
+  "  ██║  ██║██║██║        ██║   ██║   ██║██╔██╗ ██║█████╗  ",
+  "  ██║  ██║██║██║        ██║   ██║   ██║██║╚██╗██║██╔══╝  ",
+  "  ██████╔╝██║╚██████╗   ██║   ╚██████╔╝██║ ╚████║███████╗",
+  "  ╚═════╝ ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═══╝╚══════╝",
+];
+
+const GRADIENT = ["#D4A6D8", "#C4E8A0", "#A8E4F0", "#7DA8E8", "#F07888", "#F0A880", "#FFE8A0"];
+
+function AnimatedTitle({ tagline, animated = true }: { tagline: string; animated?: boolean }) {
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    if (!animated) return;
+    const id = setInterval(() => setOffset((o) => (o + 1) % GRADIENT.length), 400);
+    return () => clearInterval(id);
+  }, [animated]);
+
+  return (
+    <Box flexDirection="column" marginBottom={1}>
+      {TITLE_ART.map((line, i) => (
+        <Text key={i} bold color={GRADIENT[(i + offset) % GRADIENT.length]}>
+          {line}
+        </Text>
+      ))}
+      <Box width={TITLE_ART[0].length} justifyContent="center">
+        <Text bold italic color={GRADIENT[(offset + 1) % GRADIENT.length]}>{tagline}</Text>
+      </Box>
+    </Box>
+  );
+}
 
 // ─── Diff renderer for terminal ──────────────────────────────
 
@@ -255,9 +291,9 @@ export function App() {
       openSettings();
     }
 
-    // Back navigation with [b] for selection screens, Escape for text-input screens
-    if (input === "b" && screen === "level") setScreen("lang");
-    if (input === "b" && screen === "duration") setScreen("level");
+    // Back navigation with Escape
+    if (key.escape && screen === "level") setScreen("lang");
+    if (key.escape && screen === "duration") setScreen("level");
     if (key.escape && screen === "topic") setScreen("duration");
     if (key.escape && screen === "practice") {
       setTranscription("");
@@ -294,7 +330,7 @@ export function App() {
         setResult(null);
         setScreen("practice");
       } else if (input === "n") doGenerate();
-      else if (input === "b") {
+      else if (key.escape) {
         setResult(null);
         setScreen("lang");
       }
@@ -309,12 +345,7 @@ export function App() {
     }));
     return (
       <Box flexDirection="column" padding={1}>
-        <Box marginBottom={1}>
-          <Text bold color={C.accent}>
-            ◉ Dictune
-          </Text>
-          <Text dimColor> — {t.tagline}</Text>
-        </Box>
+        <AnimatedTitle tagline={t.tagline} />
         <Text bold>{t.selectLanguage}</Text>
         <SelectInput
           items={items}
@@ -345,6 +376,7 @@ export function App() {
     }));
     return (
       <Box flexDirection="column" padding={1}>
+        <AnimatedTitle tagline={t.tagline} />
         <Text dimColor>
           {LANGUAGES[lang].flag} {LANGUAGES[lang].native}
         </Text>
@@ -358,7 +390,7 @@ export function App() {
         />
         <Box marginTop={1}>
           <Text dimColor>
-            [b] {t.back} [s] {t.settings}
+            [Esc] {t.back} [s] {t.settings}
           </Text>
         </Box>
       </Box>
@@ -373,6 +405,7 @@ export function App() {
     }));
     return (
       <Box flexDirection="column" padding={1}>
+        <AnimatedTitle tagline={t.tagline} />
         <Text dimColor>
           {LANGUAGES[lang].flag} {LANGUAGES[lang].native} · {levelLabel}
         </Text>
@@ -386,7 +419,7 @@ export function App() {
         />
         <Box marginTop={1}>
           <Text dimColor>
-            [b] {t.back} [s] {t.settings}
+            [Esc] {t.back} [s] {t.settings}
           </Text>
         </Box>
       </Box>
@@ -397,6 +430,7 @@ export function App() {
   if (screen === "topic") {
     return (
       <Box flexDirection="column" padding={1}>
+        <AnimatedTitle tagline={t.tagline} />
         <Text dimColor>
           {LANGUAGES[lang].flag} {LANGUAGES[lang].native} · {levelLabel} ·{" "}
           {DURATIONS.find((d) => d.value === duration)?.label}
@@ -425,6 +459,7 @@ export function App() {
   if (screen === "generating") {
     return (
       <Box flexDirection="column" padding={1}>
+        <AnimatedTitle tagline={t.tagline} />
         <Box>
           <Text color={C.accent}>
             <Spinner type="dots" />
@@ -444,6 +479,7 @@ export function App() {
   if (screen === "practice") {
     return (
       <Box flexDirection="column" padding={1}>
+        <AnimatedTitle tagline={t.tagline} animated={false} />
         <Box
           borderStyle="round"
           borderColor={C.accent}
@@ -492,6 +528,7 @@ export function App() {
           : C.missing;
     return (
       <Box flexDirection="column" padding={1}>
+        <AnimatedTitle tagline={t.tagline} animated={false} />
         {/* Diff panels (side-by-side) */}
         <Box flexDirection="row" gap={1}>
           <Box
@@ -580,7 +617,7 @@ export function App() {
               { label: `[r] ${t.tryAgain}`, value: "retry" },
               { label: `[n] ${t.generateNew}`, value: "new" },
               { label: `[s] ${t.settings}`, value: "settings" },
-              { label: `[b] ${t.back}`, value: "setup" },
+              { label: `[Esc] ${t.back}`, value: "setup" },
               { label: `[q] ${t.quit}`, value: "quit" },
             ]}
             onSelect={(item) => {
@@ -620,6 +657,7 @@ export function App() {
     if (settingsStep === "menu") {
       return (
         <Box flexDirection="column" padding={1}>
+          <AnimatedTitle tagline={t.tagline} />
           <Text bold color={C.accent}>
             ⚙ AI Settings
           </Text>
@@ -692,6 +730,7 @@ export function App() {
     if (settingsStep === "test") {
       return (
         <Box flexDirection="column" padding={1}>
+          <AnimatedTitle tagline={t.tagline} />
           <Text bold color={C.accent}>
             ⚙ Testing connection...
           </Text>
@@ -728,6 +767,7 @@ export function App() {
       ];
       return (
         <Box flexDirection="column" padding={1}>
+          <AnimatedTitle tagline={t.tagline} />
           <Text bold>Select AI service:</Text>
           <SelectInput
             items={items}
@@ -752,6 +792,7 @@ export function App() {
     if (settingsStep === "url") {
       return (
         <Box flexDirection="column" padding={1}>
+          <AnimatedTitle tagline={t.tagline} />
           <Text bold>Endpoint URL:</Text>
           <Box>
             <Text color={C.accent}>❯ </Text>
@@ -775,6 +816,7 @@ export function App() {
     if (settingsStep === "key") {
       return (
         <Box flexDirection="column" padding={1}>
+          <AnimatedTitle tagline={t.tagline} />
           <Text bold>
             API Key{" "}
             {AI_PRESETS[aiConfig.preset]?.needsKey
@@ -798,6 +840,7 @@ export function App() {
       const items = aiConfig.models.map((m) => ({ label: m, value: m }));
       return (
         <Box flexDirection="column" padding={1}>
+          <AnimatedTitle tagline={t.tagline} />
           <Text bold>Select model:</Text>
           <SelectInput
             items={items}

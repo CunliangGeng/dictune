@@ -73,4 +73,13 @@ if (cmd === "update") {
   process.exit(code);
 }
 
-render(React.createElement(App));
+// Enter alternate screen buffer (like vim, htop, Claude Code)
+process.stdout.write("\x1b[?1049h");
+process.stdout.write("\x1b[H"); // move cursor to top-left
+
+const { waitUntilExit } = render(React.createElement(App));
+
+waitUntilExit().then(() => {
+  // Leave alternate screen buffer, restoring original terminal content
+  process.stdout.write("\x1b[?1049l");
+});
